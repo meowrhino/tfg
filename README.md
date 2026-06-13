@@ -52,8 +52,8 @@ Ya está activo. Si lo recreas: **Settings → Pages → Source: Deploy from a b
 - Los **embeds y enlaces externos** (YouTube, Spotify, Wikipedia…) necesitan internet.
 - **Galerías**: sin el motor, las de tipo *slideshow* se ven como carrusel deslizable
   (scroll horizontal) en vez de pase automático; las *justify* como filas de imágenes.
-- **Portada (welcome)**: los trazos a mano alzada (SVG) se posicionaban con el motor;
-  en estático quedan aproximados respecto a su posición original.
+- **Portada (welcome)**: cada palabra (hola/bon dia/hello) está fijada sobre su trazo
+  a mano alzada, igual que el original.
 - Las imágenes se optimizaron (WebP); los originales a resolución completa pueden
   re-descargarse con los scripts de `tools/`.
 

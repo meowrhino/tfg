@@ -185,7 +185,42 @@ def lang_of(purl):
     if purl.endswith('_cat'): return 'ca'
     return 'es'
 
+# welcome is a freeform page: the hand-drawn SVG markers sit at fixed coords; we
+# pin each language word on top of its drawing so they always line up (no engine).
+# coords are relative to .page top-left (measured from the rendered drawings).
+WELCOME_LINKS = [
+    ('home_1_esp', 'hola',    255, 248),  # red curve
+    ('home_1_cat', 'bon dia', 778, 466),  # blue line
+    ('home_1_eng', 'hello',   360, 624),  # yellow V
+]
+
+def build_welcome():
+    n = NODES['welcome']
+    po = n.get('page_options') or {}
+    svg = (po.get('svg_overlay') or '').strip()
+    lc = po.get('local_css') or ''
+    lsid = local_style_id(lc)
+    links = '\n'.join(
+        '          <a href="%s.html" class="welcome-link" style="left:%dpx;top:%dpx">%s</a>'
+        % (h, x, y, t) for h, t, x, y in WELCOME_LINKS)
+    extra = ('.welcome-page{position:relative;min-height:760px}'
+             '.welcome-link{position:absolute;font-size:1.4rem}'
+             '@media(max-width:700px){.welcome-link{position:static;display:block;font-size:1.6rem;margin:.4em 0}'
+             ' .welcome-page svg.marker-overlay{display:none}}')
+    localcss = '  <style>\n%s\n%s\n  </style>\n' % (lc, extra)
+    blocks = ('    <div class="page welcome-page"%s>\n'
+              '      <bodycopy class="bodycopy content content_padding">\n'
+              '        <div class="page_content"></div>\n'
+              '        %s\n'
+              '%s\n'
+              '      </bodycopy>\n'
+              '    </div>\n') % ((' local-style="%s"' % lsid) if lsid else '', svg, links)
+    return PAGE_TMPL.format(lang='es', title='welcome — meowrhino', desc='hola · hello · bon dia',
+                            localcss=localcss, blocks=blocks)
+
 def build_page(purl):
+    if purl == 'welcome':
+        return build_welcome()
     if purl in SETS:
         child_purls = SETS[purl]
         nodes = [NODES[c] for c in child_purls if c in NODES]
