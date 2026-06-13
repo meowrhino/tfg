@@ -77,52 +77,73 @@ for purl in PAGES:
         NODES[purl] = n
 
 # ---------- content cleaning ----------
+def clean_img(tag):
+    """data-src -> local src, lazy, keep dimensions, drop engine attrs.
+       If the tag has no data-src it's already been cleaned (or has a real src),
+       so leave it untouched — otherwise a second pass would blank it."""
+    ds = re.search(r'data-src="([^"]+)"', tag)
+    if not ds:
+        return tag
+    src = localize_freight(ds.group(1))
+    w = re.search(r'\bwidth="([^"]+)"', tag)
+    h = re.search(r'\bheight="([^"]+)"', tag)
+    attrs = ['src="%s"' % src, 'loading="lazy"', 'decoding="async"', 'alt=""']
+    if w: attrs.append('width="%s"' % w.group(1))
+    if h: attrs.append('height="%s"' % h.group(1))
+    return '<img ' + ' '.join(attrs) + '>'
+
+def process_galleries(html):
+    """Rebuild each Cargo gallery from its real config so the layout matches:
+       freeform -> per-image % widths (meta_data); justify -> equal-height rows;
+       slideshow -> a carousel (enhanced by gallery.js)."""
+    def repl(m):
+        cfg_raw, inner = m.group(1), m.group(2)
+        try: cfg = json.loads(unquote(cfg_raw))
+        except Exception: cfg = {}
+        mode = cfg.get('path') or 'justify'
+        data = cfg.get('data', {}) or {}
+        try: pad = float(data.get('image_padding', 2))
+        except Exception: pad = 2.0
+        cleaned = [clean_img(im) for im in re.findall(r'<img\b[^>]*>', inner)]
+        n = len(cleaned)
+        gap = 'style="--gap:%gpx"' % (pad * 3)
+        if mode == 'freeform':
+            meta = data.get('meta_data', {}) or {}
+            cards = []
+            for i, im in enumerate(cleaned):
+                w = (meta.get(str(i)) or {}).get('width') or (100.0 / max(1, n))
+                cards.append('<figure class="gcard" style="width:%s%%">%s</figure>' % (w, im))
+            return '<div class="gallery gallery-freeform" %s>%s</div>' % (gap, ''.join(cards))
+        if mode == 'slideshow':
+            auto = 1 if data.get('autoplay') else 0
+            spd = data.get('autoplaySpeed', 2.5)
+            cards = ''.join('<figure class="gcard">%s</figure>' % im for im in cleaned)
+            return ('<div class="gallery gallery-slideshow" data-autoplay="%s" data-speed="%s" %s>%s</div>'
+                    % (auto, spd, gap, cards))
+        # justify (default): equal-height rows that fill the width
+        return '<div class="gallery gallery-justify" %s>%s</div>' % (gap, ''.join(cleaned))
+    return re.sub(r'<div class="image-gallery" data-gallery="([^"]+)">(.*?)</div>',
+                  repl, html, flags=re.S)
+
 def clean_content(html):
-    # images: data-src -> src (local), lazy, drop data-mid
-    def img_sub(m):
-        tag = m.group(0)
-        ds = re.search(r'data-src="([^"]+)"', tag)
-        src = localize_freight(ds.group(1)) if ds else ''
-        w = re.search(r'\bwidth="([^"]+)"', tag)
-        h = re.search(r'\bheight="([^"]+)"', tag)
-        attrs = ['src="%s"' % src, 'loading="lazy"', 'decoding="async"', 'alt=""']
-        if w: attrs.append('width="%s"' % w.group(1))
-        if h: attrs.append('height="%s"' % h.group(1))
-        return '<img ' + ' '.join(attrs) + '>'
-    html = re.sub(r'<img\b[^>]*>', img_sub, html)
+    html = process_galleries(html)
+    # any remaining (non-gallery) imgs
+    html = re.sub(r'<img\b[^>]*>', lambda m: clean_img(m.group(0)), html)
 
-    # galleries: parse mode, add classes, drop noisy data-gallery
-    def gal_sub(m):
-        data = m.group(1)
-        mode = 'justify'
-        try:
-            mode = json.loads(unquote(data)).get('path') or 'justify'
-        except Exception:
-            pass
-        return '<div class="image-gallery initialized gallery-%s">' % mode
-    html = re.sub(r'<div class="image-gallery" data-gallery="([^"]+)">', gal_sub, html)
-
-    # videos: localize source, no preload
+    # videos: localize source, don't preload
     html = re.sub(r'<video\b', '<video preload="none"', html)
-    def src_sub(m):
-        u = m.group(1)
-        if 'files.cargocollective.com' in u: u = localize_files(u)
-        elif 'freight.cargo.site' in u: u = localize_freight(u)
-        return 'src="%s"' % u
-    html = re.sub(r'src="(https://(?:files\.cargocollective\.com|freight\.cargo\.site)/[^"]+)"', src_sub, html)
-    # audio/source tags localized the same way (covered by regex above)
+    html = re.sub(r'src="(https://(?:files\.cargocollective\.com|freight\.cargo\.site)/[^"]+)"',
+                  lambda m: 'src="%s"' % (localize_files(m.group(1)) if 'cargocollective' in m.group(1)
+                                          else localize_freight(m.group(1))), html)
 
     # internal links -> .html ; drop rel="history"
     html = html.replace('rel="history"', '')
     def link_sub(m):
         href = m.group(1)
-        # absolute meowrhino -> purl
         mm = re.match(r'https?://meowrhino\.cargo\.site/(.+)$', href)
         if mm: href = mm.group(1)
         base = href.split('?')[0].split('#')[0].strip('/')
-        if base in LINK_TARGETS:
-            return 'href="%s.html"' % base
-        return m.group(0)
+        return 'href="%s.html"' % base if base in LINK_TARGETS else m.group(0)
     html = re.sub(r'href="([^"]+)"', link_sub, html)
 
     # background-image url(freight...) -> local
@@ -176,6 +197,7 @@ PAGE_TMPL = """<!doctype html>
 <body>
   <main class="main_container">
 {blocks}  </main>
+  <script src="assets/gallery.js" defer></script>
 </body>
 </html>
 """
@@ -259,14 +281,32 @@ def localize_css_text(css):
         return 'url(%s)' % url
     return re.sub(r'url\(([^)]+)\)', u, css)
 
+def fix_webp_refs():
+    """The freight images were optimized to .webp; point HTML refs at them."""
+    import glob
+    freight = os.path.join(OUT, 'assets/freight')
+    webps = {os.path.basename(f)[:-5] for f in glob.glob(freight + '/*.webp')}  # name w/o .webp
+    def r(m):
+        base = m.group(1)
+        return 'assets/freight/%s.webp' % base if base in webps else m.group(0)
+    for fp in glob.glob(OUT + '/*.html'):
+        s = open(fp, encoding='utf-8').read()
+        n = re.sub(r'assets/freight/([^"\')\s]+)\.(?:png|jpe?g)', r, s, flags=re.IGNORECASE)
+        if n != s: open(fp, 'w', encoding='utf-8').write(n)
+
 def main():
-    if os.path.isdir(OUT): shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, 'assets/css'), exist_ok=True)
-    # copy media assets from site/ (already downloaded there)
-    for sub in ('freight', 'files', 'type'):
+    # copy media assets from site/ ONLY if missing — preserves any optimization
+    # (WebP conversion, video compression) already applied to clean/.
+    for sub in ('freight', 'files', 'type', 'static'):
         src = os.path.join(ROOT, 'site/assets', sub)
-        if os.path.isdir(src):
-            shutil.copytree(src, os.path.join(OUT, 'assets', sub))
+        dst = os.path.join(OUT, 'assets', sub)
+        if os.path.isdir(src) and not os.path.isdir(dst):
+            shutil.copytree(src, dst)
+            if sub == 'static':  # clean build doesn't use Cargo's engine JS; keep only fonts/images
+                for rt, _, files in os.walk(dst):
+                    for f in files:
+                        if f.endswith('.js'): os.remove(os.path.join(rt, f))
 
     # foundation.css from the identical inline <style> block
     h = BUNDLE['UX-UI_esp']; head = h[:h.find('</head>')]
@@ -277,8 +317,9 @@ def main():
     member = open(os.path.join(ROOT, 'site/assets/css/member_stylesheet.css')).read()
     open(os.path.join(OUT, 'assets/css/base.css'), 'w').write(localize_css_text(member))
 
-    # galleries.css: clean layouts for our static galleries + marquee
+    # galleries.css + gallery.js (our clean layout + slideshow controller)
     open(os.path.join(OUT, 'assets/css/galleries.css'), 'w').write(GALLERIES_CSS)
+    open(os.path.join(OUT, 'assets/gallery.js'), 'w').write(GALLERY_JS)
 
     # pages
     n = 0
@@ -290,6 +331,7 @@ def main():
     # index = welcome
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(build_page('welcome'))
     open(os.path.join(OUT, '.nojekyll'), 'w').close()
+    fix_webp_refs()
     print('wrote %d pages + index.html to clean/' % n)
 
 GALLERIES_CSS = """/* ============================================================
@@ -320,32 +362,86 @@ bodycopy{ display:block; }
 [grid-col="11"]{width:91.6667%}[grid-col="12"]{width:100%}
 @media (max-width:700px){ [grid-col]{width:100% !important} }
 
-/* ---- Galleries ----
-   Foundation hides direct-child media (it expects the engine to wrap each in a
-   .gallery_card). We show them and lay out by mode. */
-.image-gallery.initialized > img,
-.image-gallery.initialized > video{ display:block; max-width:100%; }
-.image-gallery img{ max-height:85vh; }
+/* ---- Typography base ----
+   Cargo sets a FIXED root font-size; every size in base.css is in rem and derives
+   from it. Matching it makes body=2rem=26.27px, h1=3rem=39.4px, h2=4rem, small=1.6rem
+   render exactly like Cargo (the browser default 16px made everything ~22% too big). */
+html{ font-size:13.1328px; }
 
-/* Slideshow -> horizontal scroll-snap carousel (swipe/scroll, no JS) */
-.gallery-slideshow{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:2px; -webkit-overflow-scrolling:touch; }
-.gallery-slideshow > img{ scroll-snap-align:center; flex:0 0 100%; width:100%; height:auto; object-fit:contain; }
+/* Content images fit their container (Cargo applies this; without it the full-res
+   originals overflow and the column shows only a cropped corner). */
+.page_content img{ max-width:100%; height:auto; }
 
-/* Justify -> single image at a sensible size; multiple -> equal-height rows */
-.gallery-justify{ display:flex; flex-wrap:wrap; gap:2px; }
-.gallery-justify > img{ width:auto; max-width:100%; height:auto; }
-.gallery-justify:has(> img + img) > img{ height:300px; width:auto; flex:1 1 auto; object-fit:cover; max-width:none; }
+/* ---- Galleries (rebuilt from each gallery's real Cargo config) ---- */
+.gallery{ --gap:6px; margin:.2rem 0; }
+.gallery img{ display:block; max-width:100%; }
+.gallery .gcard{ margin:0; }
 
-/* Freeform / fallback -> simple responsive flow */
-.gallery-freeform{ display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; }
-.gallery-freeform > img{ max-width:48%; height:auto; }
+/* Freeform: each card keeps the % width Cargo stored per image; cards flow+wrap. */
+.gallery-freeform{ display:flex; flex-wrap:wrap; align-items:flex-start; }
+.gallery-freeform .gcard{ box-sizing:border-box; padding:calc(var(--gap)/2); }
+.gallery-freeform .gcard img{ width:100%; height:auto; }
 
-/* ---- Marquee ----
-   The engine animated marquees by cloning content into .marquee_contents.
-   Statically we just show the text (a scrolling section title looks broken). */
-.marquee{ overflow:visible !important; white-space:normal !important; }
+/* Justify: equal-height rows that fill the width; a lone image stays modest. */
+.gallery-justify{ display:flex; flex-wrap:wrap; gap:var(--gap); align-items:flex-start; }
+.gallery-justify img{ height:300px; width:auto; flex:1 1 auto; object-fit:cover; }
+.gallery-justify img:only-child{ height:auto; width:auto; max-width:420px; flex:0 0 auto; object-fit:contain; }
+
+/* Slideshow: one image per view, horizontal scroll-snap carousel.
+   gallery.js wraps it in .slideshow-wrap and adds arrows + autoplay. */
+.slideshow-wrap{ position:relative; }
+.gallery-slideshow{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  gap:var(--gap); -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.gallery-slideshow::-webkit-scrollbar{ display:none; }
+.gallery-slideshow .gcard{ flex:0 0 100%; scroll-snap-align:center; }
+.gallery-slideshow .gcard img{ width:100%; height:auto; max-height:80vh; object-fit:contain; margin:0 auto; }
+.gallery-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:5; border:0;
+  background:rgba(255,255,255,.7); color:#000; font:1.6rem/1 sans-serif; width:1.8em; height:1.8em;
+  border-radius:50%; cursor:pointer; opacity:0; transition:opacity .2s; }
+.slideshow-wrap:hover .gallery-arrow{ opacity:1; }
+.gallery-arrow.prev{ left:.3rem; } .gallery-arrow.next{ right:.3rem; }
+
+/* ---- Marquee: the engine bounced these section titles across the width;
+   statically we center them (the midpoint of that motion). ---- */
+.marquee{ overflow:visible !important; white-space:normal !important; text-align:center; }
 
 video{ max-width:100%; height:auto; }
+"""
+
+GALLERY_JS = """/* Slideshow controller: arrows + autoplay (only while in view, paused on hover).
+   Swiping/scrolling works natively via CSS scroll-snap; this just enhances it. */
+(function(){
+  document.querySelectorAll('.gallery-slideshow').forEach(function(g){
+    var cards = Array.prototype.filter.call(g.children, function(c){
+      return c.classList && c.classList.contains('gcard'); });
+    if(cards.length < 2) return;
+    var wrap = document.createElement('div'); wrap.className = 'slideshow-wrap';
+    g.parentNode.insertBefore(wrap, g); wrap.appendChild(g);
+    var i = 0, timer = null, hovered = false, inview = false;
+    function go(k){ i = (k + cards.length) % cards.length;
+      g.scrollTo({ left: cards[i].offsetLeft - g.offsetLeft, behavior: 'smooth' }); }
+    ['prev','next'].forEach(function(d){
+      var b = document.createElement('button'); b.type = 'button';
+      b.className = 'gallery-arrow ' + d;
+      b.setAttribute('aria-label', d === 'prev' ? 'anterior' : 'siguiente');
+      b.textContent = d === 'prev' ? '\\u2039' : '\\u203A';
+      b.addEventListener('click', function(){ pause(); go(d === 'prev' ? i - 1 : i + 1); });
+      wrap.appendChild(b);
+    });
+    var st; g.addEventListener('scroll', function(){ clearTimeout(st);
+      st = setTimeout(function(){ i = Math.round(g.scrollLeft / g.clientWidth) % cards.length; }, 120); });
+    function play(){ if(timer || !inview || hovered || g.dataset.autoplay !== '1') return;
+      var ms = (parseFloat(g.dataset.speed) || 2.5) * 1000 + 2000;
+      timer = setInterval(function(){ go(i + 1); }, ms); }
+    function pause(){ if(timer){ clearInterval(timer); timer = null; } }
+    wrap.addEventListener('mouseenter', function(){ hovered = true; pause(); });
+    wrap.addEventListener('mouseleave', function(){ hovered = false; play(); });
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(es){ es.forEach(function(e){
+        inview = e.isIntersecting; if(inview) play(); else pause(); }); }, { threshold: 0.4 }).observe(wrap);
+    } else { inview = true; play(); }
+  });
+})();
 """
 
 if __name__ == '__main__':

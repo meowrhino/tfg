@@ -26,29 +26,47 @@ bodycopy{ display:block; }
 [grid-col="11"]{width:91.6667%}[grid-col="12"]{width:100%}
 @media (max-width:700px){ [grid-col]{width:100% !important} }
 
-/* ---- Galleries ----
-   Foundation hides direct-child media (it expects the engine to wrap each in a
-   .gallery_card). We show them and lay out by mode. */
-.image-gallery.initialized > img,
-.image-gallery.initialized > video{ display:block; max-width:100%; }
-.image-gallery img{ max-height:85vh; }
+/* ---- Typography base ----
+   Cargo sets a FIXED root font-size; every size in base.css is in rem and derives
+   from it. Matching it makes body=2rem=26.27px, h1=3rem=39.4px, h2=4rem, small=1.6rem
+   render exactly like Cargo (the browser default 16px made everything ~22% too big). */
+html{ font-size:13.1328px; }
 
-/* Slideshow -> horizontal scroll-snap carousel (swipe/scroll, no JS) */
-.gallery-slideshow{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:2px; -webkit-overflow-scrolling:touch; }
-.gallery-slideshow > img{ scroll-snap-align:center; flex:0 0 100%; width:100%; height:auto; object-fit:contain; }
+/* Content images fit their container (Cargo applies this; without it the full-res
+   originals overflow and the column shows only a cropped corner). */
+.page_content img{ max-width:100%; height:auto; }
 
-/* Justify -> single image at a sensible size; multiple -> equal-height rows */
-.gallery-justify{ display:flex; flex-wrap:wrap; gap:2px; }
-.gallery-justify > img{ width:auto; max-width:100%; height:auto; }
-.gallery-justify:has(> img + img) > img{ height:300px; width:auto; flex:1 1 auto; object-fit:cover; max-width:none; }
+/* ---- Galleries (rebuilt from each gallery's real Cargo config) ---- */
+.gallery{ --gap:6px; margin:.2rem 0; }
+.gallery img{ display:block; max-width:100%; }
+.gallery .gcard{ margin:0; }
 
-/* Freeform / fallback -> simple responsive flow */
-.gallery-freeform{ display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; }
-.gallery-freeform > img{ max-width:48%; height:auto; }
+/* Freeform: each card keeps the % width Cargo stored per image; cards flow+wrap. */
+.gallery-freeform{ display:flex; flex-wrap:wrap; align-items:flex-start; }
+.gallery-freeform .gcard{ box-sizing:border-box; padding:calc(var(--gap)/2); }
+.gallery-freeform .gcard img{ width:100%; height:auto; }
 
-/* ---- Marquee ----
-   The engine animated marquees by cloning content into .marquee_contents.
-   Statically we just show the text (a scrolling section title looks broken). */
-.marquee{ overflow:visible !important; white-space:normal !important; }
+/* Justify: equal-height rows that fill the width; a lone image stays modest. */
+.gallery-justify{ display:flex; flex-wrap:wrap; gap:var(--gap); align-items:flex-start; }
+.gallery-justify img{ height:300px; width:auto; flex:1 1 auto; object-fit:cover; }
+.gallery-justify img:only-child{ height:auto; width:auto; max-width:420px; flex:0 0 auto; object-fit:contain; }
+
+/* Slideshow: one image per view, horizontal scroll-snap carousel.
+   gallery.js wraps it in .slideshow-wrap and adds arrows + autoplay. */
+.slideshow-wrap{ position:relative; }
+.gallery-slideshow{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  gap:var(--gap); -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.gallery-slideshow::-webkit-scrollbar{ display:none; }
+.gallery-slideshow .gcard{ flex:0 0 100%; scroll-snap-align:center; }
+.gallery-slideshow .gcard img{ width:100%; height:auto; max-height:80vh; object-fit:contain; margin:0 auto; }
+.gallery-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:5; border:0;
+  background:rgba(255,255,255,.7); color:#000; font:1.6rem/1 sans-serif; width:1.8em; height:1.8em;
+  border-radius:50%; cursor:pointer; opacity:0; transition:opacity .2s; }
+.slideshow-wrap:hover .gallery-arrow{ opacity:1; }
+.gallery-arrow.prev{ left:.3rem; } .gallery-arrow.next{ right:.3rem; }
+
+/* ---- Marquee: the engine bounced these section titles across the width;
+   statically we center them (the midpoint of that motion). ---- */
+.marquee{ overflow:visible !important; white-space:normal !important; text-align:center; }
 
 video{ max-width:100%; height:auto; }

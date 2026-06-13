@@ -50,8 +50,10 @@ Ya está activo. Si lo recreas: **Settings → Pages → Source: Deploy from a b
 ## Notas
 
 - Los **embeds y enlaces externos** (YouTube, Spotify, Wikipedia…) necesitan internet.
-- **Galerías**: sin el motor, las de tipo *slideshow* se ven como carrusel deslizable
-  (scroll horizontal) en vez de pase automático; las *justify* como filas de imágenes.
+- **Galerías**: reconstruidas desde la config real de Cargo — *freeform* con los anchos
+  exactos por imagen, *justify* en filas, y *slideshow* como carrusel deslizable con
+  flechas y autoplay (`assets/gallery.js`). La tipografía usa el tamaño raíz exacto de
+  Cargo (`html{font-size:13.1328px}`), así que cuerpo/títulos/espaciados coinciden.
 - **Portada (welcome)**: cada palabra (hola/bon dia/hello) está fijada sobre su trazo
   a mano alzada, igual que el original.
 - Las imágenes se optimizaron (WebP); los originales a resolución completa pueden
