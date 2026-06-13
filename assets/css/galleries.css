@@ -1,0 +1,54 @@
+/* ============================================================
+   galleries.css — static layout for the recovered site
+   Replaces the parts the Cargo JS engine used to compute at runtime:
+   block layout for <bodycopy>, the numeric grid, gallery image layout,
+   and the marquee. (Without the engine these need explicit CSS.)
+   ============================================================ */
+
+/* <bodycopy> is a custom element (defaults to display:inline), so its
+   content_padding wouldn't indent block children. Make it a block. */
+bodycopy{ display:block; }
+
+/* ---- Grid ----
+   Content authored grid widths as [grid-col="N"] (N of 12) and spacing as
+   [grid-gutter]/[grid-pad] on a pixel scale the engine recomputed. Foundation
+   maps those attrs onto a rem scale (e.g. [grid-gutter="10"]{margin:-5rem}),
+   which overflows without the engine. So: neutralize foundation's gutter and
+   define our own simple, predictable grid. */
+[grid-row]{ margin:0 !important; width:auto !important; }
+[grid-gutter]{ margin:0 !important; }
+[grid-col]{ box-sizing:border-box; padding:0 8px !important; }
+[grid-col="1"]{width:8.3333%}  [grid-col="2"]{width:16.6667%}
+[grid-col="3"]{width:25%}      [grid-col="4"]{width:33.3333%}
+[grid-col="5"]{width:41.6667%} [grid-col="6"]{width:50%}
+[grid-col="7"]{width:58.3333%} [grid-col="8"]{width:66.6667%}
+[grid-col="9"]{width:75%}      [grid-col="10"]{width:83.3333%}
+[grid-col="11"]{width:91.6667%}[grid-col="12"]{width:100%}
+@media (max-width:700px){ [grid-col]{width:100% !important} }
+
+/* ---- Galleries ----
+   Foundation hides direct-child media (it expects the engine to wrap each in a
+   .gallery_card). We show them and lay out by mode. */
+.image-gallery.initialized > img,
+.image-gallery.initialized > video{ display:block; max-width:100%; }
+.image-gallery img{ max-height:85vh; }
+
+/* Slideshow -> horizontal scroll-snap carousel (swipe/scroll, no JS) */
+.gallery-slideshow{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:2px; -webkit-overflow-scrolling:touch; }
+.gallery-slideshow > img{ scroll-snap-align:center; flex:0 0 100%; width:100%; height:auto; object-fit:contain; }
+
+/* Justify -> single image at a sensible size; multiple -> equal-height rows */
+.gallery-justify{ display:flex; flex-wrap:wrap; gap:2px; }
+.gallery-justify > img{ width:auto; max-width:100%; height:auto; }
+.gallery-justify:has(> img + img) > img{ height:300px; width:auto; flex:1 1 auto; object-fit:cover; max-width:none; }
+
+/* Freeform / fallback -> simple responsive flow */
+.gallery-freeform{ display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; }
+.gallery-freeform > img{ max-width:48%; height:auto; }
+
+/* ---- Marquee ----
+   The engine animated marquees by cloning content into .marquee_contents.
+   Statically we just show the text (a scrolling section title looks broken). */
+.marquee{ overflow:visible !important; white-space:normal !important; }
+
+video{ max-width:100%; height:auto; }
