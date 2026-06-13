@@ -195,6 +195,12 @@ PAGE_TMPL = """<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <meta name="description" content="{desc}">
+  <link rel="icon" href="assets/freight/07185e0492_145268.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{title}">
+  <meta property="og:description" content="{desc}">
+  <meta property="og:image" content="https://meowrhino.github.io/tfg/assets/freight/88baf5011a_chicken.gif">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="assets/css/foundation.css">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/galleries.css">
@@ -344,6 +350,22 @@ def main():
     # index = welcome
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(build_page('welcome'))
     open(os.path.join(OUT, '.nojekyll'), 'w').close()
+
+    # sitemap.xml + robots.txt (SEO). Skip set/footer component pages.
+    import glob as _g
+    BASE = 'https://meowrhino.github.io/tfg/'
+    skip = {'homeFooter', 'homeFooter-copy', 'proyectos_footer_esp', 'proyectos_footer_cat',
+            'proyectos_footer_eng', 'barra-navegadora', 'welcome', '404'}
+    urls = ['index.html'] + [os.path.basename(x) for x in sorted(_g.glob(OUT + '/*.html'))
+                             if os.path.basename(x)[:-5] not in skip and os.path.basename(x) != 'index.html']
+    sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+          + ''.join('  <url><loc>%s%s</loc></url>\n' % (BASE, u) for u in urls)
+          + '</urlset>\n')
+    open(os.path.join(OUT, 'sitemap.xml'), 'w').write(sm)
+    open(os.path.join(OUT, 'robots.txt'), 'w').write(
+        'User-agent: *\nAllow: /\nSitemap: %ssitemap.xml\n' % BASE)
+
     fix_webp_refs()
     print('wrote %d pages + index.html to clean/' % n)
 
@@ -373,7 +395,18 @@ bodycopy{ display:block; }
 [grid-col="7"]{width:58.3333%} [grid-col="8"]{width:66.6667%}
 [grid-col="9"]{width:75%}      [grid-col="10"]{width:83.3333%}
 [grid-col="11"]{width:91.6667%}[grid-col="12"]{width:100%}
-@media (max-width:700px){ [grid-col]{width:100% !important} }
+
+/* ---- Mobile: stack columns + galleries to 1 column, smaller type, calm marquee
+   (Cargo used a reduced base size and single-column galleries on phones). ---- */
+@media (max-width:700px){
+  html{ font-size:11px; }
+  [grid-col]{ width:100% !important; }
+  .gallery-freeform .gcard{ width:100% !important; }
+  .gallery-justify img{ width:100% !important; height:auto !important; flex:none !important; }
+  .marquee{ white-space:normal !important; overflow:visible !important; }
+  .marquee > *{ animation:none !important; position:static !important; transform:none !important;
+    display:block !important; white-space:normal !important; font-size:2.4rem !important; }
+}
 
 /* ---- Typography base ----
    Cargo sets a FIXED root font-size; every size in base.css is in rem and derives

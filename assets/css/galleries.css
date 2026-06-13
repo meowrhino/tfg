@@ -24,7 +24,18 @@ bodycopy{ display:block; }
 [grid-col="7"]{width:58.3333%} [grid-col="8"]{width:66.6667%}
 [grid-col="9"]{width:75%}      [grid-col="10"]{width:83.3333%}
 [grid-col="11"]{width:91.6667%}[grid-col="12"]{width:100%}
-@media (max-width:700px){ [grid-col]{width:100% !important} }
+
+/* ---- Mobile: stack columns + galleries to 1 column, smaller type, calm marquee
+   (Cargo used a reduced base size and single-column galleries on phones). ---- */
+@media (max-width:700px){
+  html{ font-size:11px; }
+  [grid-col]{ width:100% !important; }
+  .gallery-freeform .gcard{ width:100% !important; }
+  .gallery-justify img{ width:100% !important; height:auto !important; flex:none !important; }
+  .marquee{ white-space:normal !important; overflow:visible !important; }
+  .marquee > *{ animation:none !important; position:static !important; transform:none !important;
+    display:block !important; white-space:normal !important; font-size:2.4rem !important; }
+}
 
 /* ---- Typography base ----
    Cargo sets a FIXED root font-size; every size in base.css is in rem and derives

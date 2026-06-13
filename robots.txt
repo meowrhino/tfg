@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://meowrhino.github.io/tfg/sitemap.xml
