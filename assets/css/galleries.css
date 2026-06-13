@@ -65,8 +65,13 @@ html{ font-size:13.1328px; }
 .slideshow-wrap:hover .gallery-arrow{ opacity:1; }
 .gallery-arrow.prev{ left:.3rem; } .gallery-arrow.next{ right:.3rem; }
 
-/* ---- Marquee: the engine bounced these section titles across the width;
-   statically we center them (the midpoint of that motion). ---- */
-.marquee{ overflow:visible !important; white-space:normal !important; text-align:center; }
+/* ---- Marquee: Cargo bounced these section titles back and forth across the
+   width (behavior="bounce"). Reproduce the bounce; respect reduced-motion. ---- */
+.marquee{ overflow:hidden !important; white-space:nowrap !important; }
+.marquee > *{ display:inline-block; margin:0; position:relative; left:0;
+  animation:marquee-bounce 9s ease-in-out infinite alternate; }
+@keyframes marquee-bounce{ to{ left:100%; transform:translateX(-100%); } }
+@media (prefers-reduced-motion:reduce){
+  .marquee > *{ animation:none; left:50%; transform:translateX(-50%); } }
 
 video{ max-width:100%; height:auto; }

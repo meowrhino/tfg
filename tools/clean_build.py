@@ -136,6 +136,11 @@ def clean_content(html):
                   lambda m: 'src="%s"' % (localize_files(m.group(1)) if 'cargocollective' in m.group(1)
                                           else localize_freight(m.group(1))), html)
 
+    # download links to Cargo's CDN -> local copies where we have them (independence)
+    html = re.sub(r'href="(https://(?:files\.cargocollective\.com|freight\.cargo\.site)/[^"]+)"',
+                  lambda m: 'href="%s"' % (localize_files(m.group(1)) if 'cargocollective' in m.group(1)
+                                           else localize_freight(m.group(1))), html)
+
     # internal links -> .html ; drop rel="history"
     html = html.replace('rel="history"', '')
     def link_sub(m):
@@ -267,7 +272,8 @@ def build_page(purl):
 
 # ---------- CSS assembly ----------
 def localize_css_text(css):
-    # localize url(...) references to cargo hosts
+    """Localize url(...) refs to cargo hosts. NOTE: these CSS files live in
+       assets/css/, so a local path 'assets/x' must be written '../x' to resolve."""
     def u(m):
         url = m.group(1).strip('\'"')
         if url.startswith('//'): url = 'https:' + url
@@ -278,6 +284,8 @@ def localize_css_text(css):
             for real, local in ASSET_MAP.items():
                 if real.split('?')[0].endswith(urlparse(url).path) and urlparse(url).path:
                     url = local; break
+        if url.startswith('assets/'):      # rebase: CSS is in assets/css/
+            url = '../' + url[len('assets/'):]
         return 'url(%s)' % url
     return re.sub(r'url\(([^)]+)\)', u, css)
 
@@ -313,9 +321,14 @@ def main():
     foundation = max(re.findall(r'<style[^>]*>(.*?)</style>', head, re.S), key=len)
     open(os.path.join(OUT, 'assets/css/foundation.css'), 'w').write(localize_css_text(foundation))
 
-    # base.css from the member stylesheet
+    # base.css from the member stylesheet. The stylesheet USES "Young Serif" but
+    # Cargo loaded its @font-face via a separate /type/css link we don't have, so
+    # define it here (path is relative to this CSS file in assets/css/).
     member = open(os.path.join(ROOT, 'site/assets/css/member_stylesheet.css')).read()
-    open(os.path.join(OUT, 'assets/css/base.css'), 'w').write(localize_css_text(member))
+    fontface = ('@font-face{font-family:"Young Serif";'
+                'src:url(../type/YoungSerif-Regular.woff) format("woff");'
+                'font-style:normal;font-weight:400;font-display:swap}\n')
+    open(os.path.join(OUT, 'assets/css/base.css'), 'w').write(fontface + localize_css_text(member))
 
     # galleries.css + gallery.js (our clean layout + slideshow controller)
     open(os.path.join(OUT, 'assets/css/galleries.css'), 'w').write(GALLERIES_CSS)
@@ -401,9 +414,14 @@ html{ font-size:13.1328px; }
 .slideshow-wrap:hover .gallery-arrow{ opacity:1; }
 .gallery-arrow.prev{ left:.3rem; } .gallery-arrow.next{ right:.3rem; }
 
-/* ---- Marquee: the engine bounced these section titles across the width;
-   statically we center them (the midpoint of that motion). ---- */
-.marquee{ overflow:visible !important; white-space:normal !important; text-align:center; }
+/* ---- Marquee: Cargo bounced these section titles back and forth across the
+   width (behavior="bounce"). Reproduce the bounce; respect reduced-motion. ---- */
+.marquee{ overflow:hidden !important; white-space:nowrap !important; }
+.marquee > *{ display:inline-block; margin:0; position:relative; left:0;
+  animation:marquee-bounce 9s ease-in-out infinite alternate; }
+@keyframes marquee-bounce{ to{ left:100%; transform:translateX(-100%); } }
+@media (prefers-reduced-motion:reduce){
+  .marquee > *{ animation:none; left:50%; transform:translateX(-50%); } }
 
 video{ max-width:100%; height:auto; }
 """
