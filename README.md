@@ -18,6 +18,7 @@ portfolio_*           portfolio (sets que apilan los proyectos)
 UX-UI_* objeto_* interaccion_*   páginas de proyecto
 CV_design_*           currículum
 tfg.html              el TFG escrito completo
+tablitas/             las tablitas, fuera de Google (ver abajo)
 404.html              página de error
 assets/
   css/
@@ -58,6 +59,19 @@ Ya está activo. Si lo recreas: **Settings → Pages → Source: Deploy from a b
   a mano alzada, igual que el original.
 - Las imágenes se optimizaron (WebP); los originales a resolución completa pueden
   re-descargarse con los scripts de `tools/`.
+
+## Tablitas
+
+`tablitas/` guarda todas las tablitas del TFG sin depender de Google:
+
+- `tablitas/<canción>/` — cada Google Sheet copiado tal cual (export HTML de Google
+  + `.xlsx` descargable), 36 en total: tablitas google, extended, aún no terminadas,
+  anotadas por hacer y los registros.
+- `tablitas/textedit/` — las tablitas originales de TextEdit (`.rtf`) y su versión `.html`.
+- `tablitas/generador.html` — pega una letra y la convierte en una tablita editable;
+  se guarda como `.html` (reabrible) o `.csv`.
+- `tablitas/nuevas/` — mete aquí los `.html` que salgan del generador y vuelve a
+  generar el índice: `python3 tools/tablitas.py` (con `--drive` re-descarga de Google).
 
 ## Reconstruir
 

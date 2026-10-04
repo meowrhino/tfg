@@ -1,0 +1,22 @@
+@font-face{font-family:"Young Serif";src:url(../assets/type/YoungSerif-Regular.woff) format("woff");font-display:swap}
+:root{--ink:#111;--soft:#777;--bg:#fff;--line:#e4e4e4}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+a{color:inherit}
+.tb-head{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;padding:.8rem 16px;background:var(--bg);border-bottom:1px solid var(--line);font-size:14px}
+.tb-head h1{margin:0;font:400 1.3rem "Young Serif",serif}
+.tb-head nav{display:flex;gap:1rem;margin-left:auto;color:var(--soft)}
+.tb-head a{text-decoration:none}
+.tb-head a:hover{text-decoration:underline}
+/* la hoja hace scroll dentro de su caja, como en sheets */
+body.sheet{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.ritz.grid-container{overflow:auto;flex:1;min-height:0}
+/* lo mínimo del css de google sheets que usa su export (su sheet.css son 4 MB de app) */
+.ritz .waffle{table-layout:fixed;width:0;border-collapse:separate;border-spacing:0;font-family:Arial,sans-serif;font-size:10pt}
+.ritz .waffle td,.ritz .waffle th{border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;overflow:hidden;padding:2px 3px;vertical-align:bottom}
+.ritz .waffle th{background:#f8f9fa;color:#80868b;font:10px Arial,sans-serif;text-align:center;font-weight:400}
+.ritz .waffle thead th{position:sticky;top:0;z-index:2}
+.ritz .waffle .row-headers-background{position:sticky;left:0;z-index:1;width:46px;min-width:46px}
+.ritz .waffle .freezebar-origin-ltr{z-index:3;left:0}
+.ritz .waffle .softmerge{overflow:visible}
+.ritz .waffle .softmerge-inner{position:relative;overflow:hidden;white-space:nowrap;text-overflow:clip}
+.ritz .waffle img{display:block}
