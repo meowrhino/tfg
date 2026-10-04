@@ -19,6 +19,7 @@ UX-UI_* objeto_* interaccion_*   páginas de proyecto
 CV_design_*           currículum
 tfg.html              el TFG escrito completo
 tablitas/             las tablitas, fuera de Google (ver abajo)
+sobres/               los 112 sobres, comprimidos (tools/sobres.py)
 404.html              página de error
 assets/
   css/
