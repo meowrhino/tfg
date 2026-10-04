@@ -11,7 +11,7 @@ imágenes directamente.
 ## Estructura
 
 ```
-index.html            selector de idioma (hola / bon dia / hello) → welcome
+index.html            portada: selector de idioma (hola / bon dia / hello)
 home_1_esp|eng|cat    portada por idioma
 about_*               sobre mí
 portfolio_*           portfolio (sets que apilan los proyectos)
@@ -19,13 +19,13 @@ UX-UI_* objeto_* interaccion_*   páginas de proyecto
 CV_design_*           currículum
 tfg.html              el TFG escrito completo
 tablitas/             las tablitas, fuera de Google (ver abajo)
-sobres/               los 112 sobres, comprimidos (tools/sobres.py)
+sobres/               los 112 sobres, comprimidos, con visor (sobres/#nombre)
 404.html              página de error
 assets/
   css/
     foundation.css    base de Cargo (rejilla, tipografía, galerías) — legible
     base.css          hoja de estilos del sitio (colores, tipos)
-    galleries.css     layout estático de galerías, rejilla y marquee (nuestro)
+    galleries.css     layout estático de galerías, rejilla, marquee y menús fijados (nuestro)
   freight/            imágenes (convertidas a WebP, optimizadas)
   files/              vídeos, audios y PDFs
   type/               fuente YoungSerif
@@ -35,6 +35,14 @@ tools/                cómo se reconstruyó (scripts + volcado de contenido)
 Cada página: `<head>` con los 3 CSS + un `<style>` con el CSS propio de esa página,
 y `<body>` con el contenido dentro de `bodycopy.page_content`. Para editar un texto,
 busca la palabra en el `.html` y cámbiala.
+
+## Navegación
+
+- portada (`index.html`) → `home_1_*` por idioma, con selector de idioma abajo y enlace al TFG.
+- `portfolio_*` y cada proyecto llevan abajo el menú «inicio · todo · UX/UI · objeto · interacción».
+- `tfg.html` lleva fija abajo a la derecha «inicio · tablitas · sobres».
+- En Cargo esos menús eran páginas «fijadas»; aquí están copiadas dentro de cada página
+  (`<div class="page pinned-overlay|pinned-fixed">`), así que si cambias uno, cámbialo en todas.
 
 ## Editar
 

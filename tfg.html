@@ -25,12 +25,6 @@
 	background-color: initial /*!variable_defaults*/;
 }
 
-[local-style="19939998"] .backdrop {
-}
-
-[local-style="19939998"] .page {
-}
-
 [local-style="19939998"] .page_background {
 	background-color: rgba(250, 215, 200, 0.2) /*!page_container_bgcolor*/;
 }
@@ -42,109 +36,30 @@
 	padding-right: 2rem /*!main_margin*/;
 }
 
-[data-predefined-style="true"] [local-style="19939998"] bodycopy {
+/* barra-navegadora */
+
+[local-style="20832443"] body {
+	background-color: initial /*!variable_defaults*/;
 }
 
-[data-predefined-style="true"] [local-style="19939998"] bodycopy a {
+[local-style="20832443"] .page_background {
+	background-color: initial /*!page_container_bgcolor*/;
 }
 
-[data-predefined-style="true"] [local-style="19939998"] bodycopy a:hover {
+[local-style="20832443"] .content_padding {
+	padding-top: 2rem /*!main_margin*/;
+	padding-bottom: 2rem /*!main_margin*/;
+	padding-left: 2rem /*!main_margin*/;
+	padding-right: 2rem /*!main_margin*/;
 }
 
-[data-predefined-style="true"] [local-style="19939998"] h1 {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h1 a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h1 a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h2 {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h2 a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h2 a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h3 {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h3 a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h3 a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h4 {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h4 a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] h4 a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_blue:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_blue:hover a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_blue:hover a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_red:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_red:hover a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_red:hover a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_yellow:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_yellow:hover a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] hover_yellow:hover a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] small {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] small a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] small a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] biblio {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] biblio a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] biblio a:hover {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] a a {
-}
-
-[data-predefined-style="true"] [local-style="19939998"] a a:hover {
-}
+  
   </style>
 </head>
 <body>
   <main class="main_container">
     <div class="page" local-style="19939998">
+      <div class="page_background"></div>
       <bodycopy class="bodycopy content content_padding">
         <div class="page_content clearfix">
 <!-- título -->
@@ -173,7 +88,7 @@
 
 <small>Me encuentro aún aprendiendo no solo a producir música sino trabajando otras cosas <i>no-musicales</i>. Compartir lo que voy haciendo es algo que me cuesta, y voy trabajando poco a poco en ello.</small><br>
 
-<small>Quizá el paso que más me ha costado dar en todo el tfg fue cuando <a href="https://enricfarresduran.com/" target="_blank">Enric Farrés</a> vino al sense paraules<sup>1</sup> y escuché las demos en voz alta, delante de todos mis compañeros.</small><br>
+<small>Quizá el paso que más me ha costado dar en todo el tfg fue cuando <a href="https://enricfarresduran.com/" target="_blank">Enric Farrés</a> vino al sense paraules<sup id="ref-sense-paraules"><a href="#nota-sense-paraules">1</a></sup> y escuché las demos en voz alta, delante de todos mis compañeros.</small><br>
 
 <small>Recuerdo llegar a casa súper cansado ese día, con una mezcla entre estrés, espectativas, miedos y tranquilidad.</small><br>
 
@@ -184,7 +99,7 @@
 
 <!-- un tfg procedimental notas -->
 
-<smaller><sup><a href="tfg_procedimental" >1</a></sup> Actividad propuesta por el tutor (<a href="https://www.instagram.com/victorvalentinpuerto/" target="_blank">Víctor</a>) para el 24 de marzo. Consistía en enseñar lo que fuese en 5 minutos, sin que el estudiante hablase, para comprobar si se comprende o no el trabajo por sí solo.<br>
+<smaller><sup id="nota-sense-paraules"><a href="#ref-sense-paraules" >1</a></sup> Actividad propuesta por el tutor (<a href="https://www.instagram.com/victorvalentinpuerto/" target="_blank">Víctor</a>) para el 24 de marzo. Consistía en enseñar lo que fuese en 5 minutos, sin que el estudiante hablase, para comprobar si se comprende o no el trabajo por sí solo.<br>
 
 
 <sup>a&nbsp;</sup>Captura de pantalla del videojuego&nbsp;<a href="https://www.nintendo.es/Juegos/Nintendo-Switch/Pokemon-Mundo-misterioso-equipo-de-rescate-DX-1695693.html" target="_blank">Pokémon Mundo Misterioso: Equipo de Rescate DX</a> para Nintendo Switch. [videojuego]. [fecha de salida: 6 marzo 2020]. [desarrollado por <a href="https://www.spike-chunsoft.com/" target="_blank">Spike Chunsoft</a>]<br>
@@ -719,17 +634,17 @@ de Owata-P, <a href="tablitas/owatap-paradichlorobenzene/" target="_blank">Parad
 
 <h4><a href="sobres/" target="_blank">sobres</a></h4><small>Paralelo a este viaje en las tablitas, he ido generando también <a href="sobres/" target="_blank">un archivo de “sobres”</a>. </small>
 <br>
-<small>Los <a href="sobres/" target="_blank">sobres</a> son archivos de cualquier tipo que he ido robando de internet. Es gente hablando sobre algo, y haciéndolo tan bien que solo podía guardarlo por si lo necesitaba en algún momento. El primer sobre fue <a href="sobres/sobre%20steven%20universe%20future.html" target="_blank">sobre steven universe future</a>, donde se habla de algo muy específico en texto. Más adelante se fue simplificando en una búsqueda de borrar las capas añadidas por manuel.</small>
+<small>Los <a href="sobres/" target="_blank">sobres</a> son archivos de cualquier tipo que he ido robando de internet. Es gente hablando sobre algo, y haciéndolo tan bien que solo podía guardarlo por si lo necesitaba en algún momento. El primer sobre fue <a href="sobres/#sobre-steven-universe-future" target="_blank">sobre steven universe future</a>, donde se habla de algo muy específico en texto. Más adelante se fue simplificando en una búsqueda de borrar las capas añadidas por manuel.</small>
 <br>
 
 <small>Quizá haya 2 tipos, según el nivel de apropiación que tengan. </small>
 <br>
 
-<small>En el primer grupo, los sobres hablan sobre algo que está implícito en ese algo.&nbsp;<a href="sobres/sobre%20el%20pop.mp4" target="_blank">sobre el pop</a> y <a href="sobres/sobre%20el%20pop%202.mp4" target="_blank">sobre el pop 2</a> ambos muestran esta característica del pop de reivindicar lo cotidiano de una manera amena, cálida y divertida. <a href="sobres/sobre%20los%20100%20tampones%20de%20la%20nasa.mp4" target="_blank">sobre los 100 tampones de la nasa</a> hace una crítica de la sociedad en la que vivimos, nuevamente de una manera amena, cálida y divertida, al igual que <a href="sobres/sobre%20memes_1.webp" target="_blank">sobre memes 1</a> y&nbsp;<a href="sobres/sobre%20memes_4.webp" target="_blank">sobre memes 4</a>. Hay varios videos de <a href="https://www.instagram.com/david_macho_69/" target="_blank">David Macho</a>, que habla muy bien de cosas muy importantes como <a href="sobres/sobre%20querer%20ganar%20dinero.mp4" target="_blank">sobre querer ganar dinero</a>. <a href="sobres/sobre%20la%20meritocracia.mp4" target="_blank">sobre la meritocracia</a>, <a href="sobres/sobre%20abusos%20y%20tristezas%20y%20risas%20y%20dientes.mp4" target="_blank">sobre abusos y tristezas y risas y dientes</a> y <a href="sobres/sobre%20los%20resultats%20desde%20madrelicious.mp4" target="_blank">sobre los resultats desde madrelicious</a> son reflexiones súper interesantes, al igual que podría serlo <a href="sobres/sobre%20Aerodynamics%20of%20a%20Lobster.mp4" target="_blank">sobre Aerodynamics of a Lobster</a>. </small>
+<small>En el primer grupo, los sobres hablan sobre algo que está implícito en ese algo.&nbsp;<a href="sobres/#sobre-el-pop" target="_blank">sobre el pop</a> y <a href="sobres/#sobre-el-pop-2" target="_blank">sobre el pop 2</a> ambos muestran esta característica del pop de reivindicar lo cotidiano de una manera amena, cálida y divertida. <a href="sobres/#sobre-los-100-tampones-de-la-nasa" target="_blank">sobre los 100 tampones de la nasa</a> hace una crítica de la sociedad en la que vivimos, nuevamente de una manera amena, cálida y divertida, al igual que <a href="sobres/#sobre-memes-1" target="_blank">sobre memes 1</a> y&nbsp;<a href="sobres/#sobre-memes-4" target="_blank">sobre memes 4</a>. Hay varios videos de <a href="https://www.instagram.com/david_macho_69/" target="_blank">David Macho</a>, que habla muy bien de cosas muy importantes como <a href="sobres/#sobre-querer-ganar-dinero" target="_blank">sobre querer ganar dinero</a>. <a href="sobres/#sobre-la-meritocracia" target="_blank">sobre la meritocracia</a>, <a href="sobres/#sobre-abusos-y-tristezas-y-risas-y-dientes" target="_blank">sobre abusos y tristezas y risas y dientes</a> y <a href="sobres/#sobre-los-resultats-desde-madrelicious" target="_blank">sobre los resultats desde madrelicious</a> son reflexiones súper interesantes, al igual que podría serlo <a href="sobres/#sobre-aerodynamics-of-a-lobster" target="_blank">sobre Aerodynamics of a Lobster</a>. </small>
 <br>
-<small>En el segundo grupo habría sobres que hablan sobre otra cosa, pero manuel en un momento dado le pone una lectura determinada. Son sobres que van de un manuel a otro, como recordatorios. <a href="sobres/sobre%20instagram.webp" target="_blank">sobre instagram</a> es un ánimo a ser más libre en redes sociales. <a href="sobres/sobre%20ter.webp" target="_blank">sobre ter</a> es una comparación que hace manuel entre <a href="https://www.youtube.com/channel/UCCNgRIfWQKZyPkNvHEzPh7Q" target="_blank">la youtube Ter</a> y los filósofos clásicos, ambos sin ningún apuro de decir lo que piensan tal y como lo piensan. <a href="sobres/sobre%20los%20libros.webp" target="_blank">sobre los libros</a> es un ánimo a no depender de estos señores blancos que piensan y escriben lo que piensan y todo el mundo les cita cuando quieren decir cosas, como si las cosas que dicen tuviesen más cuerpo al invocar estos señores. <a href="sobres/sobre%20carla%20siendo%20sabia.m4a" target="_blank">sobre carla siendo sabia</a> es un audio increíble que me mandó una amiga que a veces he tenido que volver a escuchar para encontrarme.</small>
+<small>En el segundo grupo habría sobres que hablan sobre otra cosa, pero manuel en un momento dado le pone una lectura determinada. Son sobres que van de un manuel a otro, como recordatorios. <a href="sobres/#sobre-instagram" target="_blank">sobre instagram</a> es un ánimo a ser más libre en redes sociales. <a href="sobres/#sobre-ter" target="_blank">sobre ter</a> es una comparación que hace manuel entre <a href="https://www.youtube.com/channel/UCCNgRIfWQKZyPkNvHEzPh7Q" target="_blank">la youtube Ter</a> y los filósofos clásicos, ambos sin ningún apuro de decir lo que piensan tal y como lo piensan. <a href="sobres/#sobre-los-libros" target="_blank">sobre los libros</a> es un ánimo a no depender de estos señores blancos que piensan y escriben lo que piensan y todo el mundo les cita cuando quieren decir cosas, como si las cosas que dicen tuviesen más cuerpo al invocar estos señores. <a href="sobres/#sobre-carla-siendo-sabia" target="_blank">sobre carla siendo sabia</a> es un audio increíble que me mandó una amiga que a veces he tenido que volver a escuchar para encontrarme.</small>
 <br>
-<small>Quizá el primero de los sobres en este formato de capturar algo de internet sea <a href="sobres/about%20feeling%20and%20meaning.webp" target="_blank">about feeling and meaning</a>, una captura de pantalla del <a href="https://billwurtz.com/questions/questions.html" target="_blank">questions</a> de <a href="https://www.youtube.com/user/billwurtz" target="_blank">Bill Wurtz</a>. creo que es de los sobres que más han cambiado mi forma de entender todo. </small>
+<small>Quizá el primero de los sobres en este formato de capturar algo de internet sea <a href="sobres/#about-feeling-and-meaning" target="_blank">about feeling and meaning</a>, una captura de pantalla del <a href="https://billwurtz.com/questions/questions.html" target="_blank">questions</a> de <a href="https://www.youtube.com/user/billwurtz" target="_blank">Bill Wurtz</a>. creo que es de los sobres que más han cambiado mi forma de entender todo. </small>
 <small>La librería de sobres seguramente seguirá creciendo. Hay de hecho, muchos sobres que podría quitar porque siento que su contenido se ha perdido y quedaron vacíos, pero con el mismo objetivo de dejar las tablitas tal y como estaban, dejo la carpeta <a href="sobres/" target="_blank">aquí</a> por si cualquier persona quiere echar un vistazo.</small><br><br>
 
 <!-- diarios -->
@@ -1434,6 +1349,14 @@ A lo largo de marzo fui haciendo varias demos que subí en privado a <a href="ht
 <biblio> imagen que ilustra cómo funciona los poderes de Kirby, extraída del artículo Kirby (personaje): <i>https://es.wikipedia.org </i>[en línea] [última consulta: 3 junio 2021] [origen desconocido] [fecha desconocida] URL: <a href="https://es.wikipedia.org/wiki/Archivo:Kirby_gets_an_ability_(videogame_gameplay).png">https://es.wikipedia.org/wiki/Archivo:Kirby_gets_an_ability_(videogame_gameplay).png</a> URL del artículo: https://es.wikipedia.org/wiki/Kirby_(personaje)</biblio><br>
 
 <biblio> página oficial de descarga del software UTAUloid: <i>http://utau.us/</i> [en línea [última consulta: 6 junio 2021] URL: <a href="http://utau.us/install.html">http://utau.us/install.html</a></biblio><br>
+        </div>
+      </bodycopy>
+    </div>
+    <div class="page pinned-fixed" local-style="20832443">
+      <div class="page_background"></div>
+      <bodycopy class="bodycopy content content_padding">
+        <div class="page_content clearfix">
+<div style="text-align: right"><small><a href="home_1_esp.html" >inicio</a> · <a href="tablitas/" >tablitas</a> · <a href="sobres/" >sobres</a></small></div>
         </div>
       </bodycopy>
     </div>

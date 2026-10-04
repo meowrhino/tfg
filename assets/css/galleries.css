@@ -86,3 +86,14 @@ html{ font-size:13.1328px; }
   .marquee > *{ animation:none; left:50%; transform:translateX(-50%); } }
 
 video{ max-width:100%; height:auto; }
+
+/* páginas que en cargo iban "fijadas" (pin fixed): la barra del tfg */
+.pinned-fixed{position:fixed;right:0;bottom:0;z-index:10;background:rgba(255,255,255,.85)}
+.pinned-fixed .content_padding{padding:.6rem 1rem!important}
+/* pin "bottom + overlay" de cargo: el menú se apoya sobre el final de la página (selector de idioma, menú de proyectos) */
+.main_container{position:relative}
+.pinned-overlay{position:absolute;left:0;right:0;bottom:0;z-index:5}
+/* fondo de cada página (en cargo: .page_background, pintado por el css local de la página) */
+.page:where(:not(.pinned-overlay,.pinned-fixed)){position:relative}
+.page{isolation:isolate}
+.page>.page_background{z-index:-1}

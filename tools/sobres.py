@@ -7,7 +7,7 @@
 
     python3 tools/sobres.py   # no rehace lo que ya existe; borra un archivo de sobres/ para regenerarlo
 """
-import html, subprocess, tempfile, unicodedata, urllib.parse
+import html, re, subprocess, tempfile, unicodedata, urllib.parse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,9 +24,15 @@ def run(*cmd):
     subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
 
+CLAIMED = set()  # dos originales con el mismo nombre y distinta extensión (sobre meowrhino.jpg/.png)
+
+
 def convert(src):
     ext = src.suffix.lower()
     stem = nfc(src.stem).strip()
+    if stem.lower() in CLAIMED:
+        stem += " 2"
+    CLAIMED.add(stem.lower())
     if ext in VIDEO:
         dst = OUT / f"{stem}.mp4"
         if not dst.exists():
@@ -58,19 +64,26 @@ def convert(src):
     return None, []
 
 
+def slugify(s):
+    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+
+
 def url(p):
     return urllib.parse.quote(nfc(p.name))
 
 
 def card(kind, title, files):
-    f, t = url(files[0]), html.escape(title)
+    f, t, h = url(files[0]), html.escape(title), "#" + slugify(title)
     media = {
         "video": f'<video src="{f}" controls preload="metadata" playsinline></video>',
-        "image": f'<a href="{f}"><img src="{f}" alt="{t}" loading="lazy"></a>',
+        "image": f'<a href="{h}"><img src="{f}" alt="{t}" loading="lazy"></a>',
         "audio": f'<audio src="{f}" controls preload="none"></audio>',
-        "text": f'<a class="txt" href="{f}">leer →</a> <a class="txt" href="{url(files[-1])}" download>.rtf</a>',
+        "text": f'<a class="txt" href="{h}">leer →</a> <a class="txt" href="{url(files[-1])}" download>.rtf</a>',
     }[kind]
-    return f'<figure class="{kind}">{media}<figcaption><a href="{f}">{t}</a></figcaption></figure>'
+    # data-*: lo que usa el visor (sobres/#id)
+    return (f'<figure class="{kind}" id="{slugify(title)}" data-kind="{kind}" data-src="{f}" data-title="{t}">'
+            f'{media}<figcaption><a href="{h}">{t}</a></figcaption></figure>')
 
 
 def main():
@@ -81,7 +94,7 @@ def main():
             continue
         kind, files = convert(src)
         if kind:
-            cards.append(card(kind, nfc(src.stem).strip().replace("_", " "), files))
+            cards.append(card(kind, nfc(files[0].stem).replace("_", " "), files))
             print("ok ", kind, src.name)
         else:
             print("??", src.name)

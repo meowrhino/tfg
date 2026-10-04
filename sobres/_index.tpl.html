@@ -21,6 +21,21 @@ figure.text,figure.audio{border:1px solid var(--line);padding:.8rem}
 figure.text figcaption{font:400 1.05rem "Young Serif",serif;margin:0 0 .4rem;order:-1}
 figure.text{display:flex;flex-direction:column}
 .txt{font-size:13px;color:var(--soft);text-decoration:none;margin-right:.6rem}
+/* visor */
+#viewer{position:fixed;inset:0;z-index:20;background:rgba(255,255,255,.97);display:grid;grid-template-rows:auto 1fr;grid-template-columns:3rem 1fr 3rem}
+#viewer[hidden]{display:none}
+.v-bar{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;align-items:baseline;padding:.8rem 16px;border-bottom:1px solid var(--line);font-size:14px}
+.v-bar a{text-decoration:none}.v-bar a:hover{text-decoration:underline}
+#v-title{font:400 1.15rem "Young Serif",serif}
+.v-bar .soft{color:var(--soft)}
+.v-bar .right{margin-left:auto;display:flex;gap:1rem}
+#v-stage{display:flex;align-items:center;justify-content:center;min-height:0;min-width:0;padding:1rem 0}
+#v-stage img,#v-stage video{max-width:100%;max-height:100%;object-fit:contain}
+#v-stage audio{width:min(30rem,100%)}
+#v-stage iframe{width:min(46rem,100%);height:100%;border:1px solid var(--line);background:#fff}
+#viewer button{border:0;background:none;font-size:2rem;color:var(--soft);cursor:pointer}
+#viewer button:hover{color:var(--ink)}
+@media (max-width:600px){#viewer{grid-template-columns:2rem 1fr 2rem}}
 </style>
 </head><body>
 <main>
@@ -33,4 +48,70 @@ figure.text{display:flex;flex-direction:column}
 {{cards}}
 </div>
 </main>
+
+<div id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="v-title">
+  <div class="v-bar">
+    <a href="#" id="v-close">← sobres</a>
+    <span id="v-title"></span>
+    <span class="right"><span class="soft" id="v-count"></span><a id="v-file" class="soft" target="_blank">abrir archivo</a></span>
+  </div>
+  <button id="v-prev" aria-label="sobre anterior">‹</button>
+  <div id="v-stage"></div>
+  <button id="v-next" aria-label="sobre siguiente">›</button>
+</div>
+
+<script>
+// visor: sobres/#id abre ese sobre; ←/→ (o deslizar) pasa al siguiente, esc vuelve a la rejilla
+const items = [...document.querySelectorAll('figure[data-src]')]
+const $ = s => document.getElementById(s)
+const V = $('viewer'), stage = $('v-stage')
+let cur = -1
+
+function show () {
+  const i = items.findIndex(f => f.id === decodeURIComponent(location.hash.slice(1)))
+  if (i < 0) return hide()
+  if (i === cur) return
+  const f = items[i], { kind, src, title } = f.dataset
+  document.querySelectorAll('main video, main audio').forEach(m => m.pause())
+  stage.innerHTML = {
+    image: `<img src="${src}" alt="">`,
+    video: `<video src="${src}" controls autoplay playsinline></video>`,
+    audio: `<audio src="${src}" controls autoplay></audio>`,
+    text: `<iframe src="${src}" title=""></iframe>`
+  }[kind]
+  $('v-title').textContent = title
+  $('v-count').textContent = `${i + 1} / ${items.length}`
+  $('v-file').href = src
+  V.hidden = false
+  document.body.style.overflow = 'hidden'
+  if (cur < 0) $('v-close').focus()
+  cur = i
+}
+function hide () {
+  if (cur < 0) return
+  V.hidden = true; stage.innerHTML = ''; document.body.style.overflow = ''
+  items[cur].scrollIntoView({ block: 'center' }); cur = -1
+}
+// pasar de uno a otro no llena el historial: «atrás» vuelve a donde estabas antes de abrir el visor
+const go = d => { location.replace('#' + items[(cur + d + items.length) % items.length].id); show() }
+const close = () => { history.replaceState(null, '', location.pathname); hide() }
+
+$('v-prev').onclick = () => go(-1)
+$('v-next').onclick = () => go(1)
+$('v-close').onclick = e => { e.preventDefault(); close() }
+addEventListener('hashchange', show)
+addEventListener('keydown', e => {
+  if (cur < 0) return
+  if (e.key === 'ArrowLeft') go(-1)
+  else if (e.key === 'ArrowRight') go(1)
+  else if (e.key === 'Escape') close()
+})
+let x0 = null
+stage.addEventListener('touchstart', e => { x0 = e.touches[0].clientX }, { passive: true })
+stage.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - x0
+  if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1)
+})
+show()
+</script>
 </body></html>
