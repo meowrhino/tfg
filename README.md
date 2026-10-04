@@ -77,8 +77,12 @@ Ya está activo. Si lo recreas: **Settings → Pages → Source: Deploy from a b
   + `.xlsx` descargable), 36 en total: tablitas google, extended, aún no terminadas,
   anotadas por hacer y los registros.
 - `tablitas/textedit/` — las tablitas originales de TextEdit (`.rtf`) y su versión `.html`.
-- `tablitas/generador.html` — pega una letra y la convierte en una tablita editable;
-  se guarda como `.html` (reabrible) o `.csv`.
+- `tablitas/generador.html` — el generador: un Sheets a medida de cómo se usaron las tablitas.
+  Capas alineadas por línea (texto, notas, acordes), secciones, temas con color («pintar»),
+  repeticiones, grados armónicos automáticos según la tonalidad, sílabas y esquema de rima por
+  sección. Guarda en el navegador y en archivo: «guardar archivo» descarga un `.tablita.html`
+  que es el propio generador con la tablita dentro (se abre sin internet y se sigue editando).
+  Tests: abrir `generador.html#test` y mirar la consola.
 - `tablitas/nuevas/` — mete aquí los `.html` que salgan del generador y vuelve a
   generar el índice: `python3 tools/tablitas.py` (con `--drive` re-descarga de Google).
 

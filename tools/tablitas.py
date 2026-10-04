@@ -129,7 +129,8 @@ def main():
     if "--drive" in sys.argv or not (OUT / "tablitas.json").exists():
         drive()
     entries = json.loads((OUT / "tablitas.json").read_text()) + textedit()
-    entries += [{"group": "nuevas", "title": f.stem, "href": "nuevas/" + url(f.name)} for f in sorted((OUT / "nuevas").glob("*.html"))]
+    entries += [{"group": "nuevas", "title": unicodedata.normalize("NFC", f.name[: -len(".html")].removesuffix(".tablita")), "href": "nuevas/" + url(f.name)}
+                for f in sorted((OUT / "nuevas").glob("*.html"))]
 
     sections = []
     for key, name, desc in GROUPS:

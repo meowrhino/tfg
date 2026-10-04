@@ -1,258 +1,552 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>generador de tablitas — meowrhino</title>
-<meta name="description" content="pega una letra y conviértela en una tablita: una línea por fila y columnas para traducir, anotar, analizar.">
-<link rel="icon" href="../assets/freight/07185e0492_145268.ico">
-<link rel="stylesheet" href="tablita.css">
+<title>tablita — meowrhino</title>
+<meta name="description" content="generador de tablitas: una canción por hoja, la letra línea a línea y al lado todas las capas que hagan falta (traducción, acordes, notas…), con armonía, métrica, rima y temas.">
 <style>
-main{padding:1.2rem 16px 4rem}
-.meta{display:flex;flex-wrap:wrap;gap:.6rem 1rem;margin-bottom:1rem}
-.meta input{font:inherit;border:0;border-bottom:1px solid var(--line);padding:.3rem 0;background:none;color:inherit;min-width:12rem}
-.meta #title{font:400 1.6rem "Young Serif",serif;flex:1 1 20rem}
-.bar{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.6rem 0;font-size:13px}
-button,.bar label.btn{font:inherit;font-size:13px;border:1px solid #ccc;background:#fff;color:#111;border-radius:999px;padding:.3rem .8rem;cursor:pointer}
-button:hover,.bar label.btn:hover{border-color:#111}
-.sw{width:1.4rem;height:1.4rem;padding:0;border-radius:50%}
-.sep{width:1px;height:1.2rem;background:var(--line);margin:0 .3rem}
-textarea{width:100%;box-sizing:border-box;min-height:10rem;font:13px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--line);padding:.6rem}
-details{margin:.6rem 0 1rem}
-summary{cursor:pointer;font-size:14px}
-.wrap{overflow:auto;border:1px solid #e2e2e2}
-table{border-collapse:separate;border-spacing:0;font:10pt Arial,sans-serif;min-width:100%}
-th,td{border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;padding:3px 5px;vertical-align:top;text-align:left}
-thead th{position:sticky;top:0;background:#f8f9fa;z-index:1;font-weight:400}
-thead input{font:inherit;border:0;background:none;width:100%;color:#555}
-.g{background:#f8f9fa;color:#80868b;font:10px Arial,sans-serif;white-space:nowrap;width:1%;position:sticky;left:0}
-.g button{border:0;padding:0 .2rem;background:none;font-size:11px;color:#999;visibility:hidden}
-tr:hover .g button,.g button:focus{visibility:visible}
-.g button:hover{color:#111}
-td{min-width:12rem;white-space:pre-wrap;outline:none}
-td:focus{box-shadow:inset 0 0 0 2px #1a73e8}
-tr.sec td{font-weight:700;font-style:italic}
+@font-face{font-family:"Young Serif";src:url(https://meowrhino.github.io/tfg/assets/type/YoungSerif-Regular.woff) format("woff");font-display:swap}
+:root{--ink:#111;--soft:#777;--bg:#fff;--line:#e2e2e2;--head:#f8f9fa;--focus:#1a73e8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif}
+a{color:inherit}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.top{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;padding:.7rem 16px;border-bottom:1px solid var(--line)}
+.top .home{text-decoration:none;font-size:13px}
+.top h1{margin:0;font:400 1.25rem "Young Serif",Georgia,serif}
+.top .lib{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin-left:auto}
+.pill,.lib select{border:1px solid #ccc;background:#fff;border-radius:999px;padding:.25rem .75rem;font-size:13px}
+.pill:hover{border-color:var(--ink)}
+.status{font-size:12px;color:var(--soft)}
+.status.dirty{color:#b45309}
+main{padding:1rem 16px 5rem}
+.meta{display:grid;grid-template-columns:2fr 1fr 7rem 8rem;gap:.4rem 1rem;align-items:end;margin-bottom:.6rem}
+.meta label{display:flex;flex-direction:column;font-size:11px;color:var(--soft);gap:.1rem}
+.meta input,.meta select,.meta textarea{border:0;border-bottom:1px solid var(--line);background:none;padding:.25rem 0;font-size:14px;color:var(--ink)}
+.meta #title{font:400 1.5rem "Young Serif",Georgia,serif}
+.meta .links{grid-column:1/-1}
+.meta textarea{resize:vertical;min-height:1.8rem;font-size:13px}
+.linkout{display:flex;flex-wrap:wrap;gap:.3rem .8rem;font-size:12px;margin-top:.2rem}
+.linkout a{color:var(--soft)}
+@media (max-width:700px){.meta{grid-template-columns:1fr 1fr}.meta .t{grid-column:1/-1}}
+.bar{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.5rem 0;font-size:13px}
+.bar .lbl{color:var(--soft);font-size:12px}
+.sep{width:1px;height:1.2rem;background:var(--line);margin:0 .2rem}
+.chip{display:inline-flex;align-items:center;gap:.25rem;border:1px solid transparent;border-radius:999px;padding:.1rem .3rem .1rem .45rem}
+.chip.on{border-color:var(--ink)}
+.chip input[type=color]{width:1.1rem;height:1.1rem;border:0;padding:0;background:none;cursor:pointer}
+.chip .nm{border:0;background:none;width:7rem;font-size:13px;padding:0}
+.chip button{border:0;background:none;color:#999;padding:0 .15rem}
+.chip .pick{border:0;background:none;padding:0 .2rem;font-size:12px;color:var(--soft)}
+details.paste{margin:.4rem 0 .8rem}
+details.paste summary{cursor:pointer;font-size:13px}
+details.paste textarea{width:100%;min-height:9rem;font:13px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--line);padding:.6rem;margin-top:.4rem}
 .hint{font-size:12px;color:var(--soft)}
-@media (max-width:600px){td{min-width:9rem}}
+.wrap{overflow:auto;border:1px solid var(--line);max-height:calc(100vh - 6rem)}
+table{border-collapse:separate;border-spacing:0;font:13px/1.35 Arial,sans-serif}
+th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:3px 6px;vertical-align:top;text-align:left}
+thead th{position:sticky;top:0;z-index:3;background:var(--head);font-weight:400;padding:0}
+thead .colh{resize:horizontal;overflow:hidden;min-width:3rem;padding:4px 6px;display:flex;gap:.2rem;align-items:center}
+thead .colh input{border:0;background:none;width:100%;min-width:2rem;color:#444;font-size:12px}
+thead .colh button{border:0;background:none;color:#aaa;font-size:11px;padding:0 .1rem}
+thead .colh button:hover,thead .colh button.on{color:var(--ink)}
+thead .calc{padding:4px 6px;color:#888;font-size:11px;white-space:nowrap}
+.g{position:sticky;left:0;z-index:2;background:var(--head);color:#999;font:10px Arial,sans-serif;white-space:nowrap;width:1%}
+thead .g{z-index:4}
+.g .n{display:inline-block;min-width:1.4rem;text-align:right}
+.g .dot{width:.8rem;height:.8rem;border-radius:50%;border:1px solid #ccc;background:#fff;padding:0;vertical-align:middle;margin:0 .2rem}
+.g .rep{color:#888}
+.g .act{visibility:hidden}
+tr:hover .g .act,.g .act:focus-within{visibility:visible}
+.g .act button{border:0;background:none;color:#999;font-size:11px;padding:0 .12rem}
+.g .act button:hover{color:var(--ink)}
+td.c{min-width:4rem;outline:none;white-space:pre-wrap;word-break:break-word}
+td.c:focus{box-shadow:inset 0 0 0 2px var(--focus)}
+td.c a{color:#1155cc}
+td.notes{color:#444;font-size:12px}
+td.chords{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1155cc;white-space:pre}
+td.calc{color:#555;font-size:12px;white-space:nowrap;background:#fcfcfc}
+td.deg{color:#1155cc;font-weight:700}
+td.syl{text-align:right;color:#999}
+td.rhy b{display:inline-block;min-width:1.1rem;font-weight:700}
+tr.sec td.c{font-weight:700;font-style:italic;background:#fafafa}
+tr.dim>td{opacity:.3}
+@media print{.top .lib,.bar,details.paste,.g .act,.status,.meta textarea{display:none}.wrap{max-height:none;overflow:visible;border:0}}
 </style>
 </head><body>
-<header class="tb-head"><a href="./">← tablitas</a> <h1>generador</h1>
-<nav><span class="hint" id="saved"></span></nav></header>
+<header class="top">
+  <a class="home" href="https://meowrhino.github.io/tfg/tablitas/">← tablitas</a>
+  <h1>generador de tablitas</h1>
+  <span class="status" id="status"></span>
+  <div class="lib">
+    <select id="lib" aria-label="mis tablitas"></select>
+    <button class="pill" id="new">nueva</button>
+    <label class="pill">abrir archivo<input type="file" id="open" accept=".html,.csv,.txt" hidden></label>
+    <button class="pill" id="saveFile" title="un .html que se abre en cualquier navegador y se puede seguir editando: es lo que os pasáis">guardar archivo</button>
+    <button class="pill" id="saveCsv" title="para abrir en Sheets, Excel o Numbers">.csv</button>
+    <button class="pill" id="del">borrar</button>
+  </div>
+</header>
 <main>
-<div class="meta">
-  <input id="title" placeholder="canción" aria-label="canción">
-  <input id="artist" placeholder="artista" aria-label="artista">
-  <input id="link" placeholder="enlace (youtube, spotify…)" aria-label="enlace">
-</div>
+  <div class="meta">
+    <label class="t">canción<input id="title" data-k="title"></label>
+    <label>artista<input id="artist" data-k="artist"></label>
+    <label title="para contar sílabas y rimas">idioma<select id="lang" data-k="lang"><option value="es">castellano</option><option value="en">inglés</option><option value="ja">japonés (romaji)</option></select></label>
+    <label title="para pasar acordes a grados; varias separadas por comas (Dm, Bb)">tonalidad<input id="keys" data-k="keys" placeholder="Dm, Bb"></label>
+    <label class="links">enlaces (uno por línea: youtube, genius, wikipedia…)<textarea id="links" data-k="links" rows="1"></textarea><span class="linkout" id="linkout"></span></label>
+  </div>
 
-<details id="pastebox" open>
-  <summary>pegar una letra</summary>
-  <p class="hint">Una línea = una fila. Las líneas entre corchetes (<code>[Chorus]</code>, <code>[Verse 1]</code>…) se convierten en secciones. Las líneas vacías se ignoran.</p>
-  <textarea id="lyrics" placeholder="[Verse 1]&#10;You are the only one&#10;Babe, I was so numb…"></textarea>
-  <div class="bar"><button id="fromLyrics">convertir en tablita</button><span class="hint">(sustituye lo que haya abajo)</span></div>
-</details>
+  <details class="paste" id="pastebox">
+    <summary>pegar una letra</summary>
+    <textarea id="lyrics" placeholder="[Verse 1]&#10;You are the only one&#10;Babe, I was so numb…"></textarea>
+    <div class="bar"><button class="pill" id="fromLyrics">convertir en tablita</button>
+    <span class="hint">una línea = una fila · <code>[Chorus]</code> = sección · las vacías se ignoran · sustituye lo que haya</span></div>
+  </details>
 
-<div class="bar" role="toolbar" aria-label="herramientas">
-  <button id="addRow">+ fila</button>
-  <button id="addCol">+ columna</button>
-  <span class="sep"></span>
-  <span class="hint">color de celda:</span>
-  <button class="sw" data-c="#c9daf8" style="background:#c9daf8" aria-label="azul"></button>
-  <button class="sw" data-c="#f4cccc" style="background:#f4cccc" aria-label="rosa"></button>
-  <button class="sw" data-c="#fff2cc" style="background:#fff2cc" aria-label="amarillo"></button>
-  <button class="sw" data-c="#d9ead3" style="background:#d9ead3" aria-label="verde"></button>
-  <button class="sw" data-c="" aria-label="sin color">×</button>
-  <button id="repeats" title="colorea las líneas de la primera columna que aparecen más de una vez">marcar repeticiones</button>
-  <span class="sep"></span>
-  <button id="saveHtml">guardar .html</button>
-  <button id="saveCsv">guardar .csv</button>
-  <label class="btn">abrir… <input type="file" id="open" accept=".html,.csv,.txt" hidden></label>
-  <button id="clear">nueva</button>
-</div>
+  <div class="bar" id="tagbar"></div>
+  <div class="bar">
+    <select class="pill" id="addLayer" aria-label="añadir capa">
+      <option value="">+ capa…</option>
+      <option value="text">texto (romanización, traducción…)</option>
+      <option value="notes">notas</option>
+      <option value="chords">acordes</option>
+    </select>
+    <button class="pill" id="addRow">+ fila</button>
+    <span class="sep"></span>
+    <label class="lbl"><input type="checkbox" id="showRep" checked> repeticiones</label>
+    <span class="hint">· enter: fila siguiente · shift+enter: salto de línea · ⌘B / ⌘I / ⌘K: negrita, cursiva, enlace · pegar varias líneas las reparte hacia abajo</span>
+  </div>
 
-<div class="wrap"><table id="t"><thead></thead><tbody></tbody></table></div>
-<p class="hint">Se guarda solo en este navegador. «guardar .html» crea un archivo que se ve como las tablitas del archivo y que se puede volver a abrir aquí para seguir editándolo. «.csv» se abre en Sheets, Excel o Numbers.</p>
+  <div class="wrap"><table id="t"><thead></thead><tbody></tbody></table></div>
 </main>
 
+<script type="application/json" id="doc">null</script>
 <script>
-const KEY = 'tablita-borrador'
-const COLS = ['letra', 'traducción', 'notas']
-const $ = s => document.querySelector(s)
-const thead = $('#t thead'), tbody = $('#t tbody')
-let S, lastCell = null
+// copia limpia de esta página: «guardar archivo» la reutiliza con la tablita dentro
+const PRISTINE = '<!doctype html>\n' + document.documentElement.outerHTML
+const $ = id => document.getElementById(id)
+const thead = $('t').tHead, tbody = $('t').tBodies[0]
+const PALETTE = ['#c9daf8', '#d9ead3', '#fff2cc', '#f4cccc', '#d9d2e9', '#fce5cd', '#d0e0e3', '#ead1dc']
+const uid = () => Math.random().toString(36).slice(2, 9)
+const now = () => Date.now()
 
-const blank = () => ({ title: '', artist: '', link: '', cols: [...COLS], rows: [] })
-const newRow = (sec = false) => ({ sec, c: S.cols.map(() => ''), bg: S.cols.map(() => '') })
-
-function load () {
-  try { S = JSON.parse(localStorage.getItem(KEY)) } catch (e) {}
-  if (!S || !S.cols) S = blank()
+// ───────────── música: acordes → grados
+const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII']
+const MAJOR = [0, 2, 4, 5, 7, 9, 11], MINOR = [0, 2, 3, 5, 7, 8, 10]
+function pitch (s) {
+  const m = /^([A-G])([#b♯♭]?)/.exec(s); if (!m) return null
+  return { pc: (NOTE[m[1]] + (/[#♯]/.test(m[2]) ? 1 : /[b♭]/.test(m[2]) ? 11 : 0)) % 12, len: m[0].length }
 }
-let timer
-function save () {
-  clearTimeout(timer)
-  timer = setTimeout(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(S)); $('#saved').textContent = 'guardado en este navegador' } catch (e) {}
-  }, 300)
+function parseKey (s) {
+  s = s.trim(); const p = pitch(s); if (!p) return null
+  return { name: s, pc: p.pc, minor: /^m(?!aj)|^min|minor|menor/i.test(s.slice(p.len).trim()) }
 }
-
-function render () {
-  for (const k of ['title', 'artist', 'link']) $('#' + k).value = S[k] || ''
-  thead.innerHTML = '<tr><th class="g"></th>' + S.cols.map((c, i) =>
-    `<th><input data-col="${i}" value="${esc(c)}" aria-label="nombre de columna"><span class="g"><button data-delcol="${i}" title="borrar columna">×</button></span></th>`).join('') + '</tr>'
-  tbody.innerHTML = ''
-  S.rows.forEach((r, i) => {
-    const tr = document.createElement('tr')
-    tr.className = r.sec ? 'sec' : ''
-    tr.innerHTML = `<th class="g">${i + 1} <button data-add="${i}" title="fila debajo">+</button><button data-sec="${i}" title="sección / línea">§</button><button data-del="${i}" title="borrar fila">×</button></th>`
-    const n = r.sec ? 1 : S.cols.length
-    for (let j = 0; j < n; j++) {
-      const td = document.createElement('td')
-      try { td.contentEditable = 'plaintext-only' } catch (e) { td.contentEditable = 'true' }
-      td.dataset.r = i; td.dataset.c = j
-      td.textContent = r.c[j] || ''
-      if (r.bg[j]) td.style.background = r.bg[j]
-      if (r.sec) td.colSpan = S.cols.length
-      tr.appendChild(td)
-    }
-    tbody.appendChild(tr)
-  })
+function degree (pc, key) { // número romano (mayúsculas) con alteración si sale de la escala
+  const sc = key.minor ? MINOR : MAJOR, iv = (pc - key.pc + 12) % 12
+  let i = sc.indexOf(iv)
+  if (i >= 0) return ROMAN[i]
+  // en mayor se piensa en bemoles (♭VII, ♭III); en menor en sostenidos (♯VI, ♯VII), salvo ♭II
+  const flat = sc.indexOf((iv + 1) % 12), sharp = sc.indexOf((iv + 11) % 12)
+  const useFlat = key.minor ? (sharp < 0 || sharp === 0) : !(flat < 0 || flat === 0)
+  return useFlat ? '♭' + ROMAN[flat] : '♯' + ROMAN[sharp]
 }
+function chordToDegree (tok, key) {
+  const pre = tok.match(/^[(\[]*/)[0], post = tok.match(/[)\]]*$/)[0]
+  const core = tok.slice(pre.length, tok.length - post.length)
+  const [main, bass] = core.split('/')
+  const p = pitch(main || ''); if (!p) return tok
+  let rest = main.slice(p.len), q = 'maj'
+  if (/^(dim|°|o(?![a-z]))/.test(rest)) { q = 'dim'; rest = rest.replace(/^(dim|°|o)/, '') }
+  else if (/^(aug|\+)/.test(rest)) { q = 'aug'; rest = rest.replace(/^(aug|\+)/, '') }
+  else if (/^(m(?!aj)|min|-)/.test(rest)) { q = 'min'; rest = rest.replace(/^(min|m|-)/, '') }
+  let r = degree(p.pc, key)
+  if (q === 'min' || q === 'dim') r = r.replace(/[IV]+/, x => x.toLowerCase())
+  r += (q === 'dim' ? '°' : q === 'aug' ? '+' : '') + rest
+  const b = bass && pitch(bass)
+  return pre + r + (b ? '/' + degree(b.pc, key) : bass ? '/' + bass : '') + post
+}
+const chordsToDegrees = (txt, key) => txt.trim() ? txt.trim().split(/\s+/).map(t => chordToDegree(t, key)).join(' ') : ''
 
-const esc = s => String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]))
-
-function fromLyrics (text) {
-  S.rows = []
-  for (let line of text.split(/\r?\n/)) {
-    line = line.trim()
-    if (!line) continue
-    const m = line.match(/^\[(.+)\]$/)
-    const r = newRow(!!m)
-    r.c[0] = m ? m[1] : line
-    S.rows.push(r)
+// ───────────── letra: sílabas y rima (aproximadas, sin sinalefa)
+const STRONG = 'aeoáéóíú', VOW = 'aeiouáéíóúü'
+const silentE = w => /[^aeiouy]le$/.test(w) ? w : w.replace(/(?<=[^aeiouy])e$/, '') // bottle sí, blonde no
+const strip = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+function nuclei (w, lang) { // grupos vocálicos que cuentan como sílaba
+  if (lang === 'en') {
+    w = silentE(w).replace(/(?<=[^aeiouy])es$/, 's').replace(/(?<=[^aeiouy])ed$/, 'd')
+    return w.match(/[aeiouy]+/g) || []
   }
+  const out = []
+  const groups = w.match(new RegExp(`[${VOW}]+|y(?![${VOW}])`, 'g')) || []
+  for (const g of groups) {
+    if (lang === 'ja') { out.push(...g); continue }
+    let cur = g[0]
+    for (let i = 1; i < g.length; i++) {
+      const a = g[i - 1], b = g[i]
+      if ((STRONG.includes(a) && STRONG.includes(b)) || 'íú'.includes(a) || 'íú'.includes(b)) { out.push(cur); cur = b } else cur += b
+    }
+    out.push(cur)
+  }
+  return out
+}
+const words = t => (t.toLowerCase().match(/[a-zà-ÿ']+/g) || []).map(w => w.replace(/'/g, ''))
+function syllables (text, lang) {
+  let n = 0
+  for (const w of words(text)) {
+    if (lang === 'ja') n += nuclei(w, 'ja').length + (w.match(/n(?![aeiouy])/g) || []).length + (w.match(/([kstpgdbcfhjmrwz])\1/g) || []).length
+    else n += Math.max(1, nuclei(w, lang).length)
+  }
+  return n
+}
+function rhyme (text, lang) {
+  const ws = words(text); const w = ws[ws.length - 1]; if (!w) return ''
+  if (lang === 'en') { // por ortografía, con un par de equivalencias de sonido (teen/clean, blonde/conned)
+    const x = silentE(w).replace(/(?<=[^aeiouy])ed$/, 'd').replace(/ea|ie/g, 'ee').replace(/([^aeiouy])\1/g, '$1')
+    const v = x.match(/[aeiouy]+[^aeiouy]*$/); return v ? v[0] : x
+  }
+  const nu = nuclei(w, lang); if (!nu.length) return ''
+  if (lang === 'ja') return nu.slice(-2).join('')
+  // castellano: vocal tónica (tilde, o llana si acaba en vocal/n/s) + última vocal = asonancia
+  let s = nu.findIndex(g => /[áéíóú]/.test(g))
+  if (s < 0) s = /[aeiouns]$/.test(w) && nu.length > 1 ? nu.length - 2 : nu.length - 1
+  const main = g => { const t = strip(g); const m = t.match(/[aeo]/); return m ? m[0] : t[t.length - 1] }
+  const tail = nu.slice(s).map(main)
+  return tail.length > 1 ? tail[0] + '-' + tail[tail.length - 1] : tail[0]
 }
 
-// --- edición
+// ───────────── documento
+const blankDoc = () => ({
+  v: 2, id: uid(), title: '', artist: '', lang: 'es', keys: '', links: '', created: now(), updated: now(), saved: 0,
+  layers: [{ id: uid(), name: 'letra', type: 'text', metric: true }, { id: uid(), name: 'traducción', type: 'text' }, { id: uid(), name: 'notas', type: 'notes' }],
+  tags: [], rows: []
+})
+const newRow = (kind = 'line', text = '') => ({ id: uid(), kind, text, c: {}, tag: null })
+const firstText = () => D.layers.find(l => l.type === 'text') || D.layers[0]
+const keysOf = () => D.keys.split(',').map(parseKey).filter(Boolean)
+const plain = html => { const t = document.createElement('template'); t.innerHTML = (html || '').replace(/<br\s*\/?>/gi, '\n'); return t.content.textContent }
+function clean (html) { // solo b, i, a y saltos de línea
+  const t = document.createElement('template'); t.innerHTML = html
+  const walk = n => [...n.childNodes].map(c => {
+    if (c.nodeType === 3) return c.textContent.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]))
+    if (c.nodeType !== 1) return ''
+    const tag = c.tagName, inner = walk(c)
+    if (tag === 'BR') return '<br>'
+    if (tag === 'B' || tag === 'STRONG') return inner ? `<b>${inner}</b>` : ''
+    if (tag === 'I' || tag === 'EM') return inner ? `<i>${inner}</i>` : ''
+    if (tag === 'A' && /^https?:/.test(c.getAttribute('href') || '')) return `<a href="${c.getAttribute('href').replace(/"/g, '&quot;')}">${inner}</a>`
+    if (tag === 'DIV' || tag === 'P') return '<br>' + inner
+    return inner
+  }).join('')
+  return walk(t.content).replace(/^<br>/, '').replace(/<br>$/, '')
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]))
+
+// ───────────── biblioteca (este navegador)
+const LIB = 'tablitas-v2'
+let L = { docs: {}, current: null }, D
+try { L = JSON.parse(localStorage.getItem(LIB)) || L } catch (e) {}
+let timer
+function save (touch = true) {
+  if (touch) D.updated = now()
+  L.docs[D.id] = D; L.current = D.id
+  clearTimeout(timer)
+  timer = setTimeout(() => { try { localStorage.setItem(LIB, JSON.stringify(L)) } catch (e) { alert('no se ha podido guardar en el navegador: ' + e.message) } }, 250)
+  status()
+}
+function status () {
+  const dirty = D.updated > D.saved + 1000 && D.rows.length
+  $('status').textContent = dirty ? 'guardado en el navegador · sin guardar en archivo' : D.saved ? 'guardado' : ''
+  $('status').className = 'status' + (dirty ? ' dirty' : '')
+}
+const isEmpty = d => !d.rows.length && !d.title && !d.artist
+function openDoc (d) {
+  if (D && D !== d && isEmpty(D)) delete L.docs[D.id] // «nueva» sin tocar no deja rastro
+  D = d; L.docs[d.id] = d; L.current = d.id; renderAll(); save(false)
+}
+function renderLib () {
+  const docs = Object.values(L.docs).sort((a, b) => b.updated - a.updated)
+  $('lib').innerHTML = docs.map(d => `<option value="${d.id}"${d.id === D.id ? ' selected' : ''}>${esc((d.artist ? d.artist + ' – ' : '') + (d.title || 'sin título'))}</option>`).join('')
+}
+
+// ───────────── pintar
+function columns () { // capas + columnas calculadas a su derecha
+  const cols = []
+  for (const l of D.layers) {
+    cols.push({ l })
+    if (l.type === 'text' && l.metric) cols.push({ calc: 'syl', l, name: 'síl.' }, { calc: 'rhy', l, name: 'rima' })
+    if (l.type === 'chords') for (const k of keysOf()) cols.push({ calc: 'deg', l, k, name: 'grados en ' + k.name })
+  }
+  return cols
+}
+function renderAll () {
+  for (const el of document.querySelectorAll('[data-k]')) el.value = D[el.dataset.k] ?? ''
+  renderLinks(); renderTags(); renderTable(); renderLib(); status()
+}
+function renderLinks () {
+  $('linkout').innerHTML = D.links.split('\n').map(s => s.trim()).filter(s => /^https?:\/\//.test(s))
+    .map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(new URL(u).hostname.replace(/^www\./, ''))} ↗</a>`).join('')
+}
+let activeTag = null
+function renderTags () {
+  $('tagbar').innerHTML = '<span class="lbl">temas:</span>' + D.tags.map(t =>
+    `<span class="chip${t.id === activeTag ? ' on' : ''}" style="background:${t.color}66"><input type="color" value="${t.color}" data-tagcolor="${t.id}" aria-label="color"><input class="nm" value="${esc(t.name)}" data-tagname="${t.id}" aria-label="nombre del tema"><button class="pick" data-tagpick="${t.id}" title="pintar filas con este tema y resaltarlas">${t.id === activeTag ? 'pintando' : 'pintar'}</button><button data-tagdel="${t.id}" title="borrar tema">×</button></span>`).join('') +
+    '<button class="pill" id="addTag">+ tema</button>' + (D.tags.length ? '<span class="hint">elige «pintar» y haz clic en el punto de cada fila</span>' : '<span class="hint">colores con significado (como en labyrinth: «kiss», «la orden»…)</span>')
+}
+function renderTable () {
+  const cols = columns(), span = cols.length
+  thead.innerHTML = '<tr><th class="g"></th>' + cols.map(c => c.calc
+    ? `<th><div class="calc">${esc(c.name)}</div></th>`
+    : `<th><div class="colh" style="width:${c.l.w || (c.l.type === 'notes' ? 280 : c.l.type === 'chords' ? 150 : 240)}px" data-w="${c.l.id}">
+        <input value="${esc(c.l.name)}" data-layername="${c.l.id}" aria-label="nombre de la capa">
+        ${c.l.type === 'text' ? `<button data-metric="${c.l.id}" class="${c.l.metric ? 'on' : ''}" title="contar sílabas y rimas de esta capa">síl</button>` : ''}
+        <button data-left="${c.l.id}" title="mover a la izquierda">‹</button><button data-dellayer="${c.l.id}" title="borrar capa">×</button></div></th>`).join('') + '</tr>'
+  tbody.innerHTML = D.rows.map((r, i) => {
+    const tag = D.tags.find(t => t.id === r.tag)
+    const g = `<th class="g"><span class="n">${i + 1}</span><button class="dot" data-dot="${r.id}" style="${tag ? `background:${tag.color};border-color:${tag.color}` : ''}" title="${tag ? esc(tag.name) : 'sin tema'}"></button><span class="rep" data-rep="${r.id}"></span>
+      <span class="act"><button data-add="${r.id}" title="fila debajo">+</button><button data-sec="${r.id}" title="convertir en sección / línea">§</button><button data-up="${r.id}" title="subir">↑</button><button data-down="${r.id}" title="bajar">↓</button><button data-del="${r.id}" title="borrar fila">×</button></span></th>`
+    if (r.kind === 'section') return `<tr class="sec" data-row="${r.id}">${g}<td class="c" colspan="${span}" contenteditable="true" data-sectext="${r.id}">${esc(r.text)}</td></tr>`
+    return `<tr data-row="${r.id}" style="${tag ? `background:${tag.color}40` : ''}">${g}` + cols.map(c => c.calc
+      ? `<td class="calc ${c.calc}" data-calc="${c.calc}" data-l="${c.l.id}"${c.k ? ` data-key="${esc(c.k.name)}"` : ''}></td>`
+      : `<td class="c ${c.l.type}" contenteditable="true" data-l="${c.l.id}">${r.c[c.l.id] || ''}</td>`).join('') + '</tr>'
+  }).join('')
+  if (!D.rows.length) tbody.innerHTML = `<tr><td colspan="${span + 1}" class="hint" style="padding:1rem">vacía: pega una letra arriba o añade filas con «+ fila».</td></tr>`
+  refresh()
+  for (const el of thead.querySelectorAll('[data-w]')) widthObs.observe(el)
+}
+const widthObs = new ResizeObserver(es => {
+  for (const e of es) { const l = D.layers.find(l => l.id === e.target.dataset.w); const w = Math.round(e.target.offsetWidth); if (l && l.w !== w && w > 40) { l.w = w; save(false) } }
+})
+
+// lo calculado (grados, sílabas, rima, repeticiones) se rehace en cada tecla sin tocar lo que se edita
+function refresh () {
+  const rowById = Object.fromEntries(D.rows.map(r => [r.id, r]))
+  const keys = Object.fromEntries(keysOf().map(k => [k.name, k]))
+  const ft = firstText()
+  const norm = s => strip(plain(s)).toLowerCase().replace(/[^a-z0-9ぁ-んァ-ン一-龯]+/g, '')
+  const reps = {}, progs = {}
+  for (const r of D.rows) if (r.kind === 'line') { const k = norm(r.c[ft.id]); if (k) (reps[k] = reps[k] || []).push(r.id) }
+  const repGroups = Object.values(reps).filter(g => g.length > 1)
+  // rimas: letras por sección (AABB…), color si la terminación se repite dentro de la sección
+  const scheme = {}
+  for (const l of D.layers.filter(l => l.metric)) {
+    let sec = [], letters = {}, count = {}
+    const flush = () => { for (const [id, key] of sec) scheme[l.id + id] = key ? [letters[key], count[key] > 1 ? PALETTE[letters[key].charCodeAt(0) % 8] : ''] : ['', ''] ; sec = []; letters = {}; count = {} }
+    for (const r of D.rows) {
+      if (r.kind === 'section') { flush(); continue }
+      const key = rhyme(plain(r.c[l.id]), D.lang)
+      if (key && !letters[key]) letters[key] = String.fromCharCode(65 + Object.keys(letters).length)
+      if (key) count[key] = (count[key] || 0) + 1
+      sec.push([r.id, key])
+    }
+    flush()
+  }
+  for (const tr of tbody.rows) {
+    const r = rowById[tr.dataset.row]; if (!r) continue
+    const rep = tr.querySelector('[data-rep]')
+    const gi = repGroups.findIndex(g => g.includes(r.id))
+    rep.textContent = $('showRep').checked && gi >= 0 ? '×' + repGroups[gi].length : ''
+    tr.querySelector('.n').style.boxShadow = $('showRep').checked && gi >= 0 ? `inset 3px 0 ${PALETTE[gi % 8]}` : ''
+    tr.classList.toggle('dim', !!activeTag && r.tag !== activeTag)
+    for (const td of tr.querySelectorAll('td[data-calc]')) {
+      const txt = plain(r.c[td.dataset.l])
+      if (td.dataset.calc === 'syl') td.textContent = txt.trim() ? syllables(txt, D.lang) || '' : ''
+      else if (td.dataset.calc === 'rhy') { const [letter, color] = scheme[td.dataset.l + r.id] || ['', '']; const k = rhyme(txt, D.lang); td.innerHTML = letter ? `<b>${letter}</b>${esc(k)}` : ''; td.style.background = color }
+      else { const d = chordsToDegrees(txt, keys[td.dataset.key]); td.textContent = d; if (d) (progs[td.dataset.key + d] = progs[td.dataset.key + d] || []).push(td) }
+    }
+  }
+  // progresiones que se repiten: mismo color (como el verde de teen idle)
+  let pi = 0
+  for (const tds of Object.values(progs)) { const c = tds.length > 1 ? PALETTE[(pi++ + 1) % 8] : ''; for (const td of tds) td.style.background = c }
+}
+
+// ───────────── editar
+const rowOf = el => D.rows.find(r => r.id === el.closest('tr').dataset.row)
 tbody.addEventListener('input', e => {
   const td = e.target.closest('td'); if (!td) return
-  S.rows[td.dataset.r].c[td.dataset.c] = td.innerText.replace(/\n$/, '')
-  save()
+  const r = rowOf(td)
+  if (td.dataset.sectext) r.text = td.innerText.trim()
+  else r.c[td.dataset.l] = clean(td.innerHTML)
+  refresh(); save()
 })
-tbody.addEventListener('focusin', e => { if (e.target.matches('td')) lastCell = e.target })
-tbody.addEventListener('paste', e => { // siempre texto plano
-  if (!e.target.closest('td')) return
+function focusCell (rowIdx, layerId) {
+  const tr = tbody.rows[rowIdx]; if (!tr) return
+  const td = tr.querySelector(`td[data-l="${layerId}"].c`) || tr.querySelector('td.c'); if (!td) return
+  td.focus(); const s = getSelection(); s.selectAllChildren(td); s.collapseToEnd()
+}
+tbody.addEventListener('keydown', e => {
+  const td = e.target.closest('td.c'); if (!td) return
+  const i = D.rows.indexOf(rowOf(td)), mod = e.metaKey || e.ctrlKey
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    if (mod || i === D.rows.length - 1) { D.rows.splice(i + 1, 0, newRow()); renderTable(); save() }
+    focusCell(i + 1, td.dataset.l)
+  } else if (mod && e.key.toLowerCase() === 'k') {
+    e.preventDefault(); const u = prompt('enlace (https://…)'); if (u) document.execCommand('createLink', false, u)
+  }
+})
+tbody.addEventListener('click', e => { const a = e.target.closest('td.c a'); if (a && (e.metaKey || e.ctrlKey)) { e.preventDefault(); window.open(a.href, '_blank', 'noopener') } })
+// pegar: siempre texto plano; varias líneas se reparten hacia abajo en la misma capa (como pegar una columna en sheets)
+tbody.addEventListener('paste', e => {
+  const td = e.target.closest('td.c'); if (!td) return
   e.preventDefault()
-  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'))
+  const text = e.clipboardData.getData('text/plain').replace(/\r/g, '')
+  const lines = text.split('\n').map(s => s.trim()).filter(s => s && !/^\[.*\]$/.test(s))
+  if (lines.length < 2 || td.dataset.sectext) return document.execCommand('insertText', false, text)
+  let i = D.rows.indexOf(rowOf(td)), l = td.dataset.l
+  for (const line of lines) {
+    while (D.rows[i] && D.rows[i].kind === 'section') i++
+    if (!D.rows[i]) D.rows.push(newRow())
+    D.rows[i].c[l] = esc(line); i++
+  }
+  renderTable(); save()
 })
+
 document.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return
-  const d = b.dataset
-  if (d.add) S.rows.splice(+d.add + 1, 0, newRow())
-  else if (d.sec) S.rows[d.sec].sec = !S.rows[d.sec].sec
-  else if (d.del) S.rows.splice(+d.del, 1)
-  else if (d.delcol && S.cols.length > 1 && confirm(`¿borrar la columna «${S.cols[d.delcol]}»?`)) {
-    S.cols.splice(d.delcol, 1); S.rows.forEach(r => { r.c.splice(d.delcol, 1); r.bg.splice(d.delcol, 1) })
-  } else if ('c' in d && lastCell) {
-    S.rows[lastCell.dataset.r].bg[lastCell.dataset.c] = d.c
-    lastCell.style.background = d.c
-    save(); return
-  } else return
-  render(); save()
+  const d = b.dataset, find = id => D.rows.findIndex(r => r.id === id)
+  if (d.add) D.rows.splice(find(d.add) + 1, 0, newRow())
+  else if (d.sec) { const r = D.rows[find(d.sec)]; if (r.kind === 'line') { r.kind = 'section'; r.text = plain(r.c[firstText().id]) } else { r.kind = 'line'; r.c[firstText().id] = esc(r.text) } }
+  else if (d.up) { const i = find(d.up); if (i > 0) D.rows.splice(i - 1, 0, ...D.rows.splice(i, 1)) }
+  else if (d.down) { const i = find(d.down); if (i < D.rows.length - 1) D.rows.splice(i + 1, 0, ...D.rows.splice(i, 1)) }
+  else if (d.del) D.rows.splice(find(d.del), 1)
+  else if (d.dot) {
+    const r = D.rows[find(d.dot)]; if (!D.tags.length) return alert('primero crea un tema con «+ tema»')
+    if (activeTag) r.tag = r.tag === activeTag ? null : activeTag
+    else { const i = D.tags.findIndex(t => t.id === r.tag); r.tag = i + 1 < D.tags.length ? D.tags[i + 1].id : null }
+  } else if (d.metric) { const l = D.layers.find(l => l.id === d.metric); l.metric = !l.metric }
+  else if (d.left) { const i = D.layers.findIndex(l => l.id === d.left); if (i > 0) D.layers.splice(i - 1, 0, ...D.layers.splice(i, 1)) }
+  else if (d.dellayer) {
+    const l = D.layers.find(l => l.id === d.dellayer)
+    if (D.layers.length < 2 || !confirm(`¿borrar la capa «${l.name}» y todo lo que tiene?`)) return
+    D.layers = D.layers.filter(x => x !== l); D.rows.forEach(r => delete r.c[l.id])
+  } else if (d.tagpick) { activeTag = activeTag === d.tagpick ? null : d.tagpick; renderTags(); refresh(); return }
+  else if (d.tagdel) { if (!confirm('¿borrar este tema? las filas se quedan sin tema')) return; D.tags = D.tags.filter(t => t.id !== d.tagdel); D.rows.forEach(r => { if (r.tag === d.tagdel) r.tag = null }); if (activeTag === d.tagdel) activeTag = null; renderTags() }
+  else if (b.id === 'addTag') { D.tags.push({ id: uid(), name: 'tema ' + (D.tags.length + 1), color: PALETTE[D.tags.length % 8] }); renderTags(); save(); return }
+  else return
+  renderTable(); save()
 })
-thead.addEventListener('input', e => { S.cols[e.target.dataset.col] = e.target.value; save() })
-for (const k of ['title', 'artist', 'link']) $('#' + k).addEventListener('input', e => { S[k] = e.target.value; save() })
+$('tagbar').addEventListener('input', e => {
+  const d = e.target.dataset, t = D.tags.find(t => t.id === (d.tagname || d.tagcolor)); if (!t) return
+  if (d.tagname) t.name = e.target.value
+  else { t.color = e.target.value; e.target.closest('.chip').style.background = t.color + '66'; renderTable() }
+  save()
+})
+thead.addEventListener('input', e => { const l = D.layers.find(l => l.id === e.target.dataset.layername); if (l) { l.name = e.target.value; save() } })
+for (const el of document.querySelectorAll('[data-k]')) el.addEventListener('input', () => {
+  D[el.dataset.k] = el.value
+  if (el.id === 'keys') renderTable(); else if (el.id === 'lang') refresh(); else if (el.id === 'links') renderLinks()
+  if (el.id === 'title' || el.id === 'artist') renderLib()
+  save()
+})
+$('showRep').onchange = refresh
+$('addRow').onclick = () => { D.rows.push(newRow()); renderTable(); save(); focusCell(D.rows.length - 1, firstText().id) }
+$('addLayer').onchange = e => {
+  const type = e.target.value; e.target.value = ''; if (!type) return
+  const name = prompt('nombre de la capa', { text: 'romanización', notes: 'notas', chords: 'acordes' }[type]); if (!name) return
+  D.layers.push({ id: uid(), name, type })
+  if (type === 'chords' && !D.keys) { D.keys = prompt('¿en qué tonalidad? (p. ej. Am, C, Dm, Bb — varias con comas)', '') || ''; $('keys').value = D.keys }
+  renderTable(); save()
+}
+function fromLyrics (text) {
+  const l = firstText().id
+  return text.split(/\r?\n/).map(s => s.trim()).filter(Boolean).map(s => {
+    const m = s.match(/^\[(.+)\]$/); if (m) return newRow('section', m[1])
+    const r = newRow(); r.c[l] = esc(s); return r
+  })
+}
+$('fromLyrics').onclick = () => {
+  if (D.rows.length && !confirm('¿sustituir las filas actuales por esta letra?')) return
+  D.rows = fromLyrics($('lyrics').value); $('pastebox').open = false; renderTable(); save()
+}
 
-$('#fromLyrics').onclick = () => {
-  if (S.rows.length && !confirm('¿sustituir la tablita actual por esta letra?')) return
-  fromLyrics($('#lyrics').value); $('#pastebox').open = false; render(); save()
+// ───────────── biblioteca y archivos
+$('lib').onchange = e => openDoc(L.docs[e.target.value])
+$('new').onclick = () => { openDoc(blankDoc()); $('pastebox').open = true; $('title').focus() }
+$('del').onclick = () => {
+  if (!confirm(`¿borrar «${D.title || 'sin título'}» de este navegador? (los archivos guardados no se tocan)`)) return
+  delete L.docs[D.id]; const rest = Object.values(L.docs).sort((a, b) => b.updated - a.updated)
+  openDoc(rest[0] || blankDoc())
 }
-$('#addRow').onclick = () => { S.rows.push(newRow()); render(); save() }
-$('#addCol').onclick = () => {
-  const name = prompt('nombre de la columna (romanización, instrumentación, harmonía, interpretación, rima…)', 'notas')
-  if (!name) return
-  S.cols.push(name); S.rows.forEach(r => { r.c.push(''); r.bg.push('') }); render(); save()
-}
-$('#repeats').onclick = () => {
-  const n = {}
-  S.rows.forEach(r => { if (!r.sec && r.c[0]) n[r.c[0].toLowerCase()] = (n[r.c[0].toLowerCase()] || 0) + 1 })
-  S.rows.forEach(r => { if (!r.sec && n[(r.c[0] || '').toLowerCase()] > 1) r.bg[0] = '#c9daf8' })
-  render(); save()
-}
-$('#clear').onclick = () => { if (confirm('¿empezar una tablita nueva? (la actual se borra de este navegador)')) { S = blank(); $('#lyrics').value = ''; $('#pastebox').open = true; render(); save() } }
-
-// --- guardar
-const fname = ext => ((S.artist ? S.artist + ' - ' : '') + (S.title || 'tablita')).replace(/[\\/:*?"<>|]/g, '_') + ext
+const fname = ext => ((D.artist ? D.artist + ' - ' : '') + (D.title || 'tablita')).replace(/[\\/:*?"<>|]/g, '_') + ext
 function download (data, name, type) {
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(new Blob([data], { type }))
-  a.download = name; a.click()
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000)
 }
-$('#saveCsv').onclick = () => {
+$('saveFile').onclick = () => {
+  D.saved = now(); save(false)
+  const json = JSON.stringify(D).replace(/</g, '\\u003c')
+  const page = PRISTINE.replace(/<script type="application\/json" id="doc">[\s\S]*?<\/script>/, () => `<script type="application/json" id="doc">${json}<\/script>`)
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(fname(''))} · tablita</title>`)
+  download(page, fname('.tablita.html'), 'text/html')
+  status()
+}
+$('saveCsv').onclick = () => {
   const q = s => /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
-  const lines = [S.cols, ...S.rows.map(r => r.sec ? ['[' + r.c[0] + ']'] : r.c)].map(r => r.map(q).join(','))
-  download('\ufeff' + lines.join('\r\n'), fname('.csv'), 'text/csv')
+  const cols = columns()
+  const keys = Object.fromEntries(keysOf().map(k => [k.name, k]))
+  const cell = (r, c) => { const t = plain(r.c[c.l.id]); return !c.calc ? t : c.calc === 'syl' ? (t.trim() ? String(syllables(t, D.lang)) : '') : c.calc === 'rhy' ? rhyme(t, D.lang) : chordsToDegrees(t, keys[c.k.name]) }
+  const lines = [['tema', ...cols.map(c => c.calc ? c.name : c.l.name)], ...D.rows.map(r => r.kind === 'section' ? ['', '[' + r.text + ']'] : [(D.tags.find(t => t.id === r.tag) || {}).name || '', ...cols.map(c => cell(r, c))])]
+  download('﻿' + lines.map(r => r.map(q).join(',')).join('\r\n'), fname('.csv'), 'text/csv')
 }
-$('#saveHtml').onclick = () => {
-  const title = (S.artist ? S.artist + ' - ' : '') + (S.title || 'tablita')
-  const rows = S.rows.map(r => r.sec
-    ? `<tr class="sec"><td colspan="${S.cols.length}">${esc(r.c[0])}</td></tr>`
-    : '<tr>' + r.c.map((c, j) => `<td${r.bg[j] ? ` style="background:${r.bg[j]}"` : ''}>${esc(c)}</td>`).join('') + '</tr>').join('\n')
-  const html = `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(title)} · tablitas</title>
-<style>body{margin:0;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:#fff;color:#111}
-header{padding:.8rem 16px;border-bottom:1px solid #e4e4e4}h1{margin:0;font:400 1.3rem Georgia,serif}header a{color:#777;font-size:13px}
-.wrap{overflow:auto}table{border-collapse:separate;border-spacing:0;font:10pt Arial,sans-serif}
-th,td{border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;padding:3px 5px;vertical-align:top;text-align:left;white-space:pre-wrap;min-width:12rem}
-th{background:#f8f9fa;color:#80868b;font-weight:400;position:sticky;top:0}tr.sec td{font-weight:700;font-style:italic}</style>
-</head><body>
-<header><h1>${esc(title)}</h1>${S.link ? `<a href="${esc(S.link)}">${esc(S.link)}</a>` : ''}</header>
-<div class="wrap"><table><thead><tr>${S.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>
-${rows}
-</tbody></table></div>
-<script type="application/json" id="tablita">${JSON.stringify(S).replace(/</g, '\\u003c')}<\/script>
-</body></html>`
-  download(html, fname('.html'), 'text/html')
-}
-
-// --- abrir (.html guardado aquí, .csv, o .txt con una letra)
 function parseCsv (text) {
   const rows = [[]]; let f = '', q = false
   for (let i = 0; i < text.length; i++) {
     const ch = text[i]
-    if (q) { if (ch === '"' && text[i + 1] === '"') { f += '"'; i++ } else if (ch === '"') q = false; else f += ch }
-    else if (ch === '"') q = true
-    else if (ch === ',') { rows.at(-1).push(f); f = '' }
-    else if (ch === '\n') { rows.at(-1).push(f.replace(/\r$/, '')); f = ''; rows.push([]) }
-    else f += ch
+    if (q) { if (ch === '"' && text[i + 1] === '"') { f += '"'; i++ } else if (ch === '"') q = false; else f += ch } else if (ch === '"') q = true
+    else if (ch === ',') { rows.at(-1).push(f); f = '' } else if (ch === '\n') { rows.at(-1).push(f.replace(/\r$/, '')); f = ''; rows.push([]) } else f += ch
   }
   rows.at(-1).push(f)
   return rows.filter(r => r.some(c => c !== ''))
 }
-$('#open').onchange = async e => {
-  const file = e.target.files[0]; if (!file) return
-  const text = (await file.text()).replace(/^\ufeff/, '')
-  const name = file.name.replace(/\.\w+$/, '')
+function adopt (d) { // abrir una tablita que viene de un archivo
+  const mine = L.docs[d.id]
+  if (mine && mine.updated > d.updated && !confirm('en este navegador tienes una versión más nueva de esta tablita.\n\naceptar: abrir la del archivo (sustituye la tuya)\ncancelar: quedarte con la tuya')) return openDoc(mine)
+  openDoc(d)
+}
+$('open').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return
+  const text = (await file.text()).replace(/^﻿/, ''), name = file.name.replace(/(\.tablita)?\.\w+$/, '')
   if (/\.html?$/i.test(file.name)) {
-    const m = text.match(/<script type="application\/json" id="tablita">([\s\S]*?)<\/script>/)
-    if (!m) return alert('este .html no es una tablita guardada desde el generador')
-    S = JSON.parse(m[1])
-  } else if (/\.csv$/i.test(file.name)) {
-    const [head, ...rest] = parseCsv(text)
-    S = { ...blank(), title: name, cols: head }
-    S.rows = rest.map(r => {
-      const m = r.length === 1 && r[0].match(/^\[(.+)\]$/)
-      const row = newRow(!!m)
-      if (m) row.c[0] = m[1]; else head.forEach((_, j) => { row.c[j] = r[j] || '' })
-      return row
-    })
-  } else {
-    S = { ...blank(), title: name }; fromLyrics(text)
+    const m = text.match(/<script type="application\/json" id="doc">([\s\S]*?)<\/script>/)
+    const d = m && JSON.parse(m[1]); if (!d || d.v !== 2) return alert('este .html no es una tablita del generador')
+    return adopt(d)
   }
-  e.target.value = ''; $('#pastebox').open = false; render(); save()
+  const d = blankDoc(); d.title = name
+  if (/\.csv$/i.test(file.name)) {
+    const [head, ...rest] = parseCsv(text)
+    const hasTag = head[0] === 'tema', names = hasTag ? head.slice(1) : head
+    d.layers = names.map((n, i) => ({ id: uid(), name: n || 'capa ' + (i + 1), type: 'text', metric: i === 0 }))
+    d.rows = rest.map(r => {
+      const cells = hasTag ? r.slice(1) : r
+      const m = cells.filter(Boolean).length === 1 && (cells.find(Boolean) || '').match(/^\[(.+)\]$/)
+      if (m) return newRow('section', m[1])
+      const row = newRow(); d.layers.forEach((l, i) => { if (cells[i]) row.c[l.id] = esc(cells[i]) }); return row
+    })
+  } else { D = d; d.rows = fromLyrics(text) }
+  openDoc(d)
 }
 
-load(); render()
-if (S.rows.length) $('#pastebox').open = false
+// ───────────── arrancar: la tablita del archivo (si esta página es una tablita guardada) o la última abierta
+const embedded = JSON.parse($('doc').textContent)
+if (embedded) adopt(embedded)
+else openDoc(L.docs[L.current] || blankDoc())
+if (!D.rows.length) $('pastebox').open = true
+
+// comprobación rápida: abre la página con #test y mira la consola
+if (location.hash === '#test') {
+  const k = s => parseKey(s), eq = (a, b) => console.assert(a === b, `${a} ≠ ${b}`)
+  eq(chordToDegree('Am7', k('C')), 'vi7'); eq(chordToDegree('Fmaj7', k('C')), 'IVmaj7'); eq(chordToDegree('G/C', k('C')), 'V/I')
+  eq(chordToDegree('Bb', k('C')), '♭VII'); eq(chordToDegree('A', k('Dm')), 'V'); eq(chordToDegree('C', k('Dm')), 'VII')
+  eq(chordToDegree('Bb', k('Dm')), 'VI'); eq(chordToDegree('Gm', k('Dm')), 'iv'); eq(chordToDegree('C#dim', k('Dm')), '♯vii°')
+  eq(chordToDegree('Eb', k('Dm')), '♭II'); eq(chordToDegree('Bdim', k('C')), 'vii°'); eq(chordToDegree('(Dm', k('Dm')), '(i')
+  eq(chordsToDegrees('Dm  C   F  Bb', k('Dm')), 'i VII III VI'); eq(chordsToDegrees('Dm C F Bb', k('Bb')), 'iii II V I')
+  eq(syllables('la noche está estrellada', 'es'), 9); eq(syllables('poesía', 'es'), 4); eq(syllables('ciudad', 'es'), 2)
+  eq(syllables('kimi o sagashite', 'ja'), 7); eq(syllables('itsuka', 'ja'), 3); eq(syllables('juuryoku', 'ja'), 4)
+  eq(syllables('I wanna be a bottle blonde', 'en'), 8)
+  eq(rhyme('mi corazón', 'es'), 'o'); eq(rhyme('el cielo', 'es'), 'e-o'); eq(rhyme('del suelo', 'es'), 'e-o'); eq(rhyme('canción', 'es'), 'o'); eq(rhyme('árbol', 'es'), 'a-o')
+  eq(rhyme('in the night', 'en'), rhyme('the light', 'en')); eq(rhyme('idle teen', 'en'), rhyme('so clean', 'en')); eq(rhyme('bottle blonde', 'en'), rhyme('I feel conned', 'en'))
+  console.log('tests de la tablita: hechos (si no hay errores arriba, todo bien)')
+}
 </script>
 </body></html>
